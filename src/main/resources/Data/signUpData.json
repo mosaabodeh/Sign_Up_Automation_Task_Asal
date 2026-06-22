@@ -1,0 +1,28 @@
+{
+  "validSignUp": {
+    "firstName": "Test",
+    "lastName": "Automation",
+    "emailBase": "mosaab.cp+",
+    "emailDomain": "@gmail.com",
+    "password": "Mosaab_cb0595",
+    "country": "palestine,state Of",
+    "emailImapPassword": "ssamtsxmvzlyboeh"
+  },
+  "invalidEmailSignUp": {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "faulty-email-format",
+    "password": "SecurePassword123!",
+    "country": "United Kingdom",
+    "expectedErrorMessage": "Please enter a valid email address"
+  },
+  "weakPasswordSignUp": {
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "emailBase": "mosaab.cp+",
+    "emailDomain": "@gmail.com",
+    "password": "123",
+    "country": "Canada",
+    "expectedErrorMessage": "Password does not meet complexity requirements"
+  }
+}
