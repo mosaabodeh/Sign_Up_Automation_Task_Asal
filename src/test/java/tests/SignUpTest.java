@@ -50,7 +50,7 @@ public class SignUpTest extends BaseTest {
         String errorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "invalidEmailSignUp", "expectedErrorMessage");
 
         signUpPage.toastMessage();
-        boolean isVisible = signUpPage.verifyErrorMessageViaOcr("Please enter a valid e-mail address!");
+        boolean isVisible = signUpPage.verifyErrorMessageViaOcr(errorMessage);
 
         Assert.assertTrue(isVisible, "The validation error message was not displayed on the screen.");
        // Assert.assertTrue(signUpPage.isEmailFieldVisible());
