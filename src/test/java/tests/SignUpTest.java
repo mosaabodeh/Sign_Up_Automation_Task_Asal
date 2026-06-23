@@ -36,9 +36,13 @@ public class SignUpTest extends BaseTest {
         signUpPage.submitPasswordStage(passwordForSignUp,registrationCode);
         signUpPage.fillPersonalInfo(firstName,lastName,country);
         System.out.println(" The User With Data: " + firstName +"\t"+lastName+"\t"+"From : "+country+" Is Sign Up Successfully");
-        Assert.assertTrue(signUpPage.IsAllowButtonExisit(), "Failsafe: The Sign up process Flow Not executed Successfully.");
+        Assert.assertTrue(signUpPage.IsAllowButtonExisit(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With AllowContact Button.");
+    //This Just For Selection
+        //signUpPage.UploadPhotoAvatar();
+        signUpPage.CancelUploadAvatarProcess();//This is runnable but not necessary
+        Assert.assertTrue(signUpPage.IsContinueButtonApear(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
+        //
 
-        signUpPage.UploadPhotoAvatar();
 
     }
     @Test(priority = 2, description = "Complete the dynamic sign up registration ensure bad scenario")

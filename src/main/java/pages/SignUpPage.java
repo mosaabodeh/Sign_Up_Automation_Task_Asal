@@ -28,6 +28,7 @@ public class SignUpPage extends BasePage {
         click(ElementsPage.CONTINUE_BUTTON);
     }
 
+
     public void submitEmailStage(String email) {
         waitForClickability(ElementsPage.SignUpField).click();
         enterEmail(email);
@@ -49,6 +50,9 @@ public class SignUpPage extends BasePage {
     }
     public boolean IsAllowButtonExisit(){
         return   waitForVisibility(ElementsPage.ALLow_CONTACT_BUTTON).isDisplayed();
+    }
+    public boolean IsContinueButtonApear(){
+        return   waitForVisibility(ElementsPage.Continue_BUTTON_ASSErtion).isDisplayed();
     }
 
 
@@ -75,6 +79,16 @@ public class SignUpPage extends BasePage {
         waitForClickability(ElementsPage.DONE_BUTTON).click();
         waitForClickability(ElementsPage.SAVE_BUTTON).click();
 
+    }
+    public void CancelUploadAvatarProcess(){
+        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
+        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
+        waitForClickability(ElementsPage.CHANGE_AVATAR).click();
+        waitForClickability(ElementsPage.UPLOAD_PHOTO).click();
+        waitForClickability(ElementsPage.SELECT_USER_PHONE_PHOTO).click();
+        waitForClickability(ElementsPage.JUST_ONE_SELECT).click();
+        waitForClickability(ElementsPage.CANCEL_BUTTON).click();
+        waitForClickability(ElementsPage.NAVIGATE_BACK).click();
     }
 
     public void submitPasswordStage(String password, String registrationCode) {
