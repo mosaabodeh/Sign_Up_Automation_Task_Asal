@@ -23,6 +23,6 @@
     "emailDomain": "@gmail.com",
     "password": "123",
     "country": "Canada",
-    "expectedErrorMessage": "Password does not meet complexity requirements"
+    "expectedErrorMessage": "Invalid password Password must be more than 12 characters in length and contain + 1 lowercase letter"
   }
 }
