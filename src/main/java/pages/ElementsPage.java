@@ -5,6 +5,14 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 public class ElementsPage extends BasePage{
+    public static final By ALLow_CONTACT_BUTTON=By.id("com.android.permissioncontroller:id/permission_allow_button");
+    public static final By CHANGE_AVATAR=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(22)");
+    public static final By UPLOAD_PHOTO=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(5)");
+    public static final By SELECT_USER_PHONE_PHOTO=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(5)");
+    public static final By JUST_ONE_SELECT=AppiumBy.androidUIAutomator("new UiSelector().resourceId(\"android:id/button_once\")");
+    public static final By DONE_BUTTON=By.id("com.sec.android.gallery3d:id/menu_edit_app_bar_done");
+    public static final By SAVE_BUTTON=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(12)");
+
 
     public static final By CONTINUE_BUTTON = AppiumBy.androidUIAutomator(
             "new UiSelector().text(\"Continue\")");

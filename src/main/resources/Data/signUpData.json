@@ -24,5 +24,13 @@
     "password": "123",
     "country": "Canada",
     "expectedErrorMessage": "Invalid password Password must be more than 12 characters in length and contain + 1 lowercase letter"
+  },
+  "blankMandatoryFieldsSignUp": {
+    "expectedErrorMessage": "Field is mandatory"
+  },
+  "duplicateEmailSignUp": {
+    "email": "mosaab.cp+1782194902025@gmail.com",
+    "password": "SecurePassword123!",
+    "expectedErrorMessage": "Email address already registered"
   }
 }

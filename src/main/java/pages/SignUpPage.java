@@ -44,6 +44,13 @@ public class SignUpPage extends BasePage {
     protected void enterVerificationCode(String registrationCode) {
         waitForVisibility(ElementsPage.VERIFICATION_FIELD).sendKeys(registrationCode);
     }
+    public boolean IsVerificationFieldExisit(){
+      return   waitForVisibility(ElementsPage.VERIFICATION_FIELD).isDisplayed();
+    }
+    public boolean IsAllowButtonExisit(){
+        return   waitForVisibility(ElementsPage.ALLow_CONTACT_BUTTON).isDisplayed();
+    }
+
 
     protected void enterPassword(String password) {
         waitForVisibility(ElementsPage.PASSWORD_FIELD).sendKeys(password);
@@ -57,6 +64,17 @@ public class SignUpPage extends BasePage {
                 .moveToElement(element, xOffset, 0)
                 .click()
                 .perform();
+    }
+    public void UploadPhotoAvatar(){
+        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
+        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
+        waitForClickability(ElementsPage.CHANGE_AVATAR).click();
+        waitForClickability(ElementsPage.UPLOAD_PHOTO).click();
+        waitForClickability(ElementsPage.SELECT_USER_PHONE_PHOTO).click();
+        waitForClickability(ElementsPage.JUST_ONE_SELECT).click();
+        waitForClickability(ElementsPage.DONE_BUTTON).click();
+        waitForClickability(ElementsPage.SAVE_BUTTON).click();
+
     }
 
     public void submitPasswordStage(String password, String registrationCode) {
@@ -178,5 +196,11 @@ public class SignUpPage extends BasePage {
         swipeSequence.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
         driver.perform(Collections.singletonList(swipeSequence));
+    }
+
+    public void clickSubmitWithoutInputs() {
+        waitForClickability(ElementsPage.SignUpField).click();
+        clickContinue();
+
     }
 }

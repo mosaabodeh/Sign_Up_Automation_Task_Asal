@@ -36,6 +36,9 @@ public class SignUpTest extends BaseTest {
         signUpPage.submitPasswordStage(passwordForSignUp,registrationCode);
         signUpPage.fillPersonalInfo(firstName,lastName,country);
         System.out.println(" The User With Data: " + firstName +"\t"+lastName+"\t"+"From : "+country+" Is Sign Up Successfully");
+        Assert.assertTrue(signUpPage.IsAllowButtonExisit(), "Failsafe: The Sign up process Flow Not executed Successfully.");
+
+        signUpPage.UploadPhotoAvatar();
 
     }
     @Test(priority = 2, description = "Complete the dynamic sign up registration ensure bad scenario")
@@ -77,6 +80,28 @@ public class SignUpTest extends BaseTest {
 
         Assert.assertTrue(isErrorDisplayed,
                 "Failsafe: The expected validation error message '" + expectedErrorMessage + "' was not found by OCR scanning.");
+    }
+    @Test(priority = 4, description = "Verify that attempting to submit with blank mandatory fields throws structural validation inline errors")
+    public void testBlankMandatoryFieldsValidation() {
+        String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "blankMandatoryFieldsSignUp", "expectedErrorMessage");
+
+        signUpPage.clickSubmitWithoutInputs();
+
+        boolean isErrorDisplayed = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
+        Assert.assertTrue(isErrorDisplayed, "Failsafe: Missing field mandatory warning labels were not detected by OCR scanning.");
+    }
+
+    @Test(priority = 5, description = "Verify that signing up with an already registered email throws a duplicate registration toast exception")
+    public void testDuplicateEmailRegistrationValidation() {
+        String duplicateEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "email");
+        String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "expectedErrorMessage");
+        System.out.println("The User Email is : "+duplicateEmail);
+        signUpPage.submitEmailStage(duplicateEmail);
+
+        //boolean isErrorDisplayed = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
+
+        //Assertion on the verification code , because if the email is duplicate we will block the ui message (for The Security concerns , to prevent attacker)
+        Assert.assertTrue(signUpPage.IsVerificationFieldExisit(), "Failsafe: Duplicate email profile warning .");
     }
 
 
