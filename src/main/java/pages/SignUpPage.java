@@ -149,7 +149,12 @@ public class SignUpPage extends BasePage {
 
                 String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
                 System.out.println("📸 Polling Screen via OCR for compressed layout matches...");
-
+                try {
+                    waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
+                    System.out.println("✅ Cancel creation button found and clicked.");
+                } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
+                    System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
+                }
                 return normalizedOcr.contains(normalizedExpected);
             });
         } catch (org.openqa.selenium.TimeoutException e) {
@@ -243,13 +248,14 @@ public class SignUpPage extends BasePage {
 
     public void clickSubmitWithoutInputs() {
         waitForClickability(ElementsPage.SignUpField).click();
-        clickContinue();
         try {
             waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
             System.out.println("✅ Cancel creation button found and clicked.");
         } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
             System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
         }
+        clickContinue();
+
 
     }
 }
