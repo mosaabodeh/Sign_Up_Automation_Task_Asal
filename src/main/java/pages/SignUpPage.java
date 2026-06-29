@@ -5,10 +5,12 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ToastOcrHandler;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class SignUpPage extends BasePage {
 
@@ -92,7 +94,12 @@ public class SignUpPage extends BasePage {
     }
 
     public void submitPasswordStage(String password, String registrationCode) {
-        enterVerificationCode(registrationCode);
+        try {
+            waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
+            System.out.println("✅ Cancel creation button found and clicked.");
+        } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
+            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
+        }        enterVerificationCode(registrationCode);
         enterPassword(password);
         clickTermsButton();
         clickContinue();
@@ -115,16 +122,34 @@ public class SignUpPage extends BasePage {
 
 
 
-    public boolean verifyErrorMessageViaOcr(String expectedErrorMessage) {
-        String parsedText = ToastOcrHandler.captureAndReadToast(driver);
+    public boolean verifyErrorMessageViaOcr(String expectedMessage) {
+        // 1. Strip everything except basic alphanumeric characters, lower it, and remove all spaces
+        String normalizedExpected = expectedMessage.toLowerCase()
+                .replaceAll("[^a-z0-9]", ""); // 🚀 Removes spaces, dashes, pluses completely
 
-        parsedText = parsedText.replaceAll("\\s+", " ").trim();
+        System.out.println("==================================================");
+        System.out.println("🎯 TARGET NORMALIZED EXPECTED: [" + normalizedExpected + "]");
+        System.out.println("==================================================");
 
-        if (parsedText.contains(expectedErrorMessage)) {
-            System.out.println("✅ Test Passed! Validation message [" + expectedErrorMessage + "] detected via OCR.");
-            return true;
-        } else {
-            System.out.println("❌ Test Failed. Expected: [" + expectedErrorMessage + "] but OCR found: " + parsedText);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+
+        try {
+            return wait.until(d -> {
+                String rawOcrText = ToastOcrHandler.captureAndReadToast(driver);
+
+                if (rawOcrText == null || rawOcrText.isEmpty()) {
+                    return false;
+                }
+
+                // 2. Strip the captured screen text exactly the same way
+                String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
+                System.out.println("📸 Polling Screen via OCR for compressed layout matches...");
+
+                // 3. Now "contain+1" and "contain1" both compress beautifully and match!
+                return normalizedOcr.contains(normalizedExpected);
+            });
+        } catch (org.openqa.selenium.TimeoutException e) {
+            System.out.println("❌ Timeout: The expected error text was not found via OCR within 5 seconds.");
             return false;
         }
     }
@@ -215,6 +240,12 @@ public class SignUpPage extends BasePage {
     public void clickSubmitWithoutInputs() {
         waitForClickability(ElementsPage.SignUpField).click();
         clickContinue();
+        try {
+            waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
+            System.out.println("✅ Cancel creation button found and clicked.");
+        } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
+            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
+        }
 
     }
 }

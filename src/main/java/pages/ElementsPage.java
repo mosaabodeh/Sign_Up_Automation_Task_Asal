@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
 public class ElementsPage extends BasePage{
-    //To be Make Dynamic
     public static final By ALLow_CONTACT_BUTTON=By.id("com.android.permissioncontroller:id/permission_allow_button");
     public static final By CHANGE_AVATAR=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(22)");
     public static final By UPLOAD_PHOTO=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(5)");
@@ -16,6 +15,7 @@ public class ElementsPage extends BasePage{
     public static final By NAVIGATE_BACK =AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(19)");
     public static final By CANCEL_BUTTON = AppiumBy.id("com.sec.android.gallery3d:id/menu_edit_app_bar_cancel");
     public static final By Continue_BUTTON_ASSErtion = AppiumBy.id("com.ale.rainbow:id/continueButton");
+    public static final By CANCLE_BUTTON_CREATION=AppiumBy.androidUIAutomator("new UiSelector().className(\"android.view.View\").instance(5)");
 
 
 

@@ -7,7 +7,6 @@ import java.util.Properties;
 public class ConfigReader {
     private static Properties properties;
 
-    //  emulator.properties or realdevice.properties)
     public static void loadConfig(String fileName) {
         try {
             properties = new Properties();
