@@ -1,62 +1,67 @@
 package pages;
-import io.appium.java_client.android.AndroidDriver;
+
+import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ConfigReader;
-import utils.ToastOcrHandler;
+import io.appium.java_client.HasOnScreenKeyboard;
+import io.appium.java_client.HidesKeyboard;
 import java.time.Duration;
 
 public class BasePage {
-    protected AndroidDriver driver;
-    protected static WebDriverWait wait;
 
-    public BasePage(AndroidDriver driver) {
+
+
+    protected AppiumDriver driver;
+    protected WebDriverWait wait;
+
+    public BasePage(AppiumDriver driver) {
         this.driver = driver;
-        String timeoutProp = ConfigReader.getProperty("timeout.explicit");
-        long defaultTimeout = (timeoutProp != null) ? Long.parseLong(timeoutProp) : 10;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(defaultTimeout));
+
+        long timeout = Long.parseLong(
+                ConfigReader.getProperty("timeout.explicit", "10")
+        );
+
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
     }
 
-    protected static WebElement waitForVisibility(By locator) {
+    protected WebElement waitVisible(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
-    protected WebElement waitForClickability(By locator) {
+    protected WebElement waitClickable(By locator) {
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
     protected void click(By locator) {
-        waitForClickability(locator).click();
+        waitClickable(locator).click();
     }
 
 
-
-    protected void sendKeys(By locator, String text) {
-        WebElement element = waitForVisibility(locator);
-        element.click();
-        element.clear();
-        element.sendKeys(text);
-
+    protected void type(By locator, String text) {
+        WebElement el = waitVisible(locator);
+        el.clear();
+        el.sendKeys(text);
     }
-    public void toastMessage() {
 
-        String parsedText = ToastOcrHandler.captureAndReadToast(driver);
-
-        parsedText = parsedText.replaceAll("\\s+", " ");
-
-        String expectedErrorMessage = "Please enter a valid e-mail address!";
-
-        if (parsedText.contains(expectedErrorMessage)) {
-            System.out.println("✅ Test Passed! Validation message detected via OCR.");
-        } else {
-            System.out.println("❌ Test Failed. Expected: '" + expectedErrorMessage + "' but OCR found: " + parsedText);
+    protected boolean isDisplayed(By locator) {
+        try {
+            return waitVisible(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    protected void implicitWait(long duration){
-        driver.manage().timeouts().implicitlyWait(java.time.Duration.ofSeconds(duration));
+    protected void hideKeyboardIfShown() {
+        try {
+            if (driver instanceof HasOnScreenKeyboard && driver instanceof HidesKeyboard) {
+                boolean shown = ((HasOnScreenKeyboard) driver).isKeyboardShown();
+                if (shown) {
+                    ((HidesKeyboard) driver).hideKeyboard();
+                }
+            }
+        } catch (Exception ignored) {}
     }
-
 }

@@ -32,5 +32,9 @@
     "email": "mosaab.cp+1782194902025@gmail.com",
     "password": "SecurePassword123!",
     "expectedErrorMessage": "Email address already registered"
+  },
+
+  "EmptyFieldsSignUp": {
+    "expectedErrorMessage": "Login or password is missing"
   }
 }

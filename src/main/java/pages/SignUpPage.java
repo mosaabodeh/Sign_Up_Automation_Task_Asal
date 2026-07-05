@@ -1,166 +1,114 @@
 package pages;
+
 import io.appium.java_client.AppiumBy;
-import io.appium.java_client.android.AndroidDriver;
-import org.openqa.selenium.*;
+import io.appium.java_client.AppiumDriver;
+import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import pages.locators.ElementKey;
+import pages.locators.ElementRegistry;
 import utils.ToastOcrHandler;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
-import java.util.regex.Pattern;
 
 public class SignUpPage extends BasePage {
 
-    public SignUpPage(AndroidDriver driver) {
+    public SignUpPage(AppiumDriver driver) {
         super(driver);
     }
 
-   /* public boolean isEmailFieldVisible() {
-        return waitForVisibility(ElementsPage.SignUpField).isDisplayed();
-    }*/
-
-    protected void enterEmail(String email) {
-        sendKeys(ElementsPage.EMAIL_FIELD, email);
+    public void enterEmail(String email) {
+        By emailField = ElementRegistry.get("mobile", ElementKey.EMAIL_FIELD);
+        type(emailField, email);
     }
 
-    protected void clickContinue() {
-        click(ElementsPage.CONTINUE_BUTTON);
+    public void clickContinue() {
+        By continueBtn = ElementRegistry.get("mobile", ElementKey.CONTINUE_BUTTON);
+        click(continueBtn);
     }
 
 
     public void submitEmailStage(String email) {
-        waitForClickability(ElementsPage.SignUpField).click();
+        By signUpButton = ElementRegistry.get("mobile", ElementKey.SIGNUP_FIELD);
+        click(signUpButton) ;
+        By emailField = ElementRegistry.get("mobile", ElementKey.EMAIL_FIELD);
+        By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
+
+        click(emailField);
         try {
-            waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
-            System.out.println("✅ Cancel creation button found and clicked.");
-        } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
-            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
-        }
+            click(cancelBtn);
+        } catch (Exception ignored) {}
+
         enterEmail(email);
-        try {
-            if (driver.isKeyboardShown()) {
-                driver.hideKeyboard();
-            }
-        } catch (Exception e) {
-            System.out.println("⚠️ Note: Keyboard dismiss bypassed before Continue click.");
-        }
+        hideKeyboardIfShown();
         clickContinue();
     }
 
-    protected void enterVerificationCode(String registrationCode) {
-        waitForVisibility(ElementsPage.VERIFICATION_FIELD).sendKeys(registrationCode);
-    }
-    public boolean IsVerificationFieldExisit(){
-      return   waitForVisibility(ElementsPage.VERIFICATION_FIELD).isDisplayed();
-    }
-    public boolean IsAllowButtonExisit(){
-        return   waitForVisibility(ElementsPage.ALLow_CONTACT_BUTTON).isDisplayed();
-    }
-    public boolean IsContinueButtonApear(){
-        return   waitForVisibility(ElementsPage.Continue_BUTTON_ASSErtion).isDisplayed();
+    public void enterPassword(String password) {
+        By passwordField = ElementRegistry.get("mobile", ElementKey.PASSWORD_FIELD);
+        type(passwordField, password);
     }
 
-
-    protected void enterPassword(String password) {
-        waitForVisibility(ElementsPage.PASSWORD_FIELD).sendKeys(password);
-    }
 
     protected void clickTermsButton() {
-        WebElement element = waitForClickability(ElementsPage.TERMS_CHECKBOX);
+        By termsCheckbox = ElementRegistry.get("mobile", ElementKey.TERMS_CHECKBOX);
+        org.openqa.selenium.WebElement element = waitClickable(termsCheckbox);
         int xOffset = -(element.getSize().getWidth() / 2) + 35;
-
         new Actions(driver)
                 .moveToElement(element, xOffset, 0)
                 .click()
                 .perform();
     }
-    public void UploadPhotoAvatar(){
-        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
-        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
-        waitForClickability(ElementsPage.CHANGE_AVATAR).click();
-        waitForClickability(ElementsPage.UPLOAD_PHOTO).click();
-        waitForClickability(ElementsPage.SELECT_USER_PHONE_PHOTO).click();
-        waitForClickability(ElementsPage.JUST_ONE_SELECT).click();
-        waitForClickability(ElementsPage.DONE_BUTTON).click();
-        waitForClickability(ElementsPage.SAVE_BUTTON).click();
-
-    }
-    public void CancelUploadAvatarProcess(){
-        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
-        waitForClickability(ElementsPage.ALLow_CONTACT_BUTTON).click();
-        waitForClickability(ElementsPage.CHANGE_AVATAR).click();
-        waitForClickability(ElementsPage.UPLOAD_PHOTO).click();
-        waitForClickability(ElementsPage.SELECT_USER_PHONE_PHOTO).click();
-        waitForClickability(ElementsPage.JUST_ONE_SELECT).click();
-        waitForClickability(ElementsPage.CANCEL_BUTTON).click();
-        waitForClickability(ElementsPage.NAVIGATE_BACK).click();
-    }
-
-    public void submitPasswordStage(String password, String registrationCode) {
+    public void submitPasswordStage(String password, String code) {
+        By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
+        By codeField = ElementRegistry.get("mobile", ElementKey.VERIFICATION_FIELD);
         try {
-            waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
-            System.out.println("✅ Cancel creation button found and clicked.");
-        } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
-            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
-        }        enterVerificationCode(registrationCode);
+            click(cancelBtn);
+        } catch (Exception ignored) {}
+
+        type(codeField, code);
         enterPassword(password);
         clickTermsButton();
         clickContinue();
     }
+    public void fillPersonalInfo(String firstName, String lastName, String targetCountry) {
+        By firstNameField = ElementRegistry.get("mobile", ElementKey.FIRST_NAME_FIELD);
+        By lastNameField = ElementRegistry.get("mobile", ElementKey.LAST_NAME_FIELD);
+        By countryDropdownField = ElementRegistry.get("mobile", ElementKey.COUNTRY_DROPDOWN_FIELD);
+        By finishButton = ElementRegistry.get("mobile", ElementKey.FINISH_BUTTON);
 
-    public void fillPersonalInfo(String firstName, String lastName, String targetCountry)  {
-        waitForClickability(ElementsPage.FIRST_NAME_FIELD).sendKeys(firstName);
-        waitForClickability(ElementsPage.LAST_NAME_FIELD).sendKeys(lastName);
+        waitClickable(firstNameField).sendKeys(firstName);
+        waitClickable(lastNameField).sendKeys(lastName);
 
-        if (driver.isKeyboardShown()) {
-            driver.hideKeyboard();
-        }
+        hideKeyboardIfShown();
 
-        waitForClickability(ElementsPage.COUNTRY_DROPDOWN_FIELD).click();
+        // 1. Open the spinner dropdown list overlay
+        waitClickable(countryDropdownField).click();
 
+        // 2. Perform the dynamic scrolling search
         scrollToElementAndClick(targetCountry);
 
-        waitForClickability(ElementsPage.FINISH_BUTTON).click();
+        // 3. Confirm selection
+        waitClickable(finishButton).click();
     }
 
+    private void executePhysicalSwipe(int startX, int startY, int endY) {
+        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
+        Sequence swipeSequence = new Sequence(finger, 1);
 
+        swipeSequence.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
+        swipeSequence.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
+        // Changed duration from 350ms to 600ms to give a smooth, realistic inertia momentum across lists
+        swipeSequence.addAction(finger.createPointerMove(Duration.ofMillis(600), PointerInput.Origin.viewport(), startX, endY));
+        swipeSequence.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-    public boolean verifyErrorMessageViaOcr(String expectedMessage) {
-        // 1. Strip everything except basic alphanumeric characters, lower it, and remove all spaces
-        String normalizedExpected = expectedMessage.toLowerCase()
-                .replaceAll("[^a-z0-9]", ""); // 🚀 Removes spaces, dashes, pluses completely
-
-        System.out.println("==================================================");
-        System.out.println("🎯 TARGET NORMALIZED EXPECTED: [" + normalizedExpected + "]");
-        System.out.println("==================================================");
-
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-
-        try {
-            return wait.until(d -> {
-                String rawOcrText = ToastOcrHandler.captureAndReadToast(driver);
-
-                if (rawOcrText == null || rawOcrText.isEmpty()) {
-                    return false;
-                }
-
-                String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
-                System.out.println("📸 Polling Screen via OCR for compressed layout matches...");
-                try {
-                    waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
-                    System.out.println("✅ Cancel creation button found and clicked.");
-                } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
-                    System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
-                }
-                return normalizedOcr.contains(normalizedExpected);
-            });
-        } catch (org.openqa.selenium.TimeoutException e) {
-            System.out.println("❌ Timeout: The expected error text was not found via OCR within 5 seconds.");
-            return false;
-        }
+        driver.perform(Collections.singletonList(swipeSequence));
     }
 
     public void scrollToElementAndClick(String targetText) {
@@ -168,37 +116,37 @@ public class SignUpPage extends BasePage {
         int maxScrolls = 20;
         int scrollCount = 0;
 
-        // 1. Sanitize the string case early (e.g., "palestine,state Of" -> "palestine")
         String cleanKeyword = targetText.trim().toLowerCase();
         if (cleanKeyword.contains(",")) {
             cleanKeyword = cleanKeyword.split(",")[0].trim();
         }
 
-        WebElement scrollView = ElementsPage.scrollToAndGetCountry();
+        // FIX: Instead of getting bounds from the tiny form input field button,
+        // we locate the active scrollable view/spinner layout on screen to grab the correct heights
+        WebElement activeScrollContainer = waitVisible(AppiumBy.xpath(
+                "//android.widget.ListView | //android.widget.ScrollView | //android.view.View[@scrollable='true']"
+        ));
 
-        // Get screen container bounds
-        org.openqa.selenium.Rectangle containerRect = scrollView.getRect();
+        // Get the full screen layout bounds of the opened scroll selection area
+        org.openqa.selenium.Rectangle containerRect = activeScrollContainer.getRect();
         int centerX = containerRect.getX() + (containerRect.getWidth() / 2);
-        int startY = containerRect.getY() + (int)(containerRect.getHeight() * 0.75);
-        int endY = containerRect.getY() + (int)(containerRect.getHeight() * 0.25);
+        int startY = containerRect.getY() + (int)(containerRect.getHeight() * 0.80);
+        int endY = containerRect.getY() + (int)(containerRect.getHeight() * 0.20);
 
-        // Dynamic translation statement optimized for scannability
         String lowerCaseXpath = ".//android.widget.TextView[contains(translate(@text, " +
                 "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + cleanKeyword + "')]";
 
         try {
-            // Drop implicit wait down once before entering the fast iteration sequence
             driver.manage().timeouts().implicitlyWait(Duration.ZERO);
 
             while (!elementFound && scrollCount < maxScrolls) {
-                // 3. Scan ONLY inside the active ScrollView container node layout to save search time
-                List<WebElement> elements = scrollView.findElements(AppiumBy.xpath(lowerCaseXpath));
+                // Scan elements strictly relative inside the active overlay list block container
+                List<WebElement> elements = activeScrollContainer.findElements(AppiumBy.xpath(lowerCaseXpath));
 
                 if (!elements.isEmpty()) {
                     WebElement targetItem = elements.getFirst();
                     if (targetItem.isDisplayed()) {
                         try {
-                            // Click the parent wrapper container node
                             targetItem.findElement(AppiumBy.xpath("./..")).click();
                         } catch (Exception e) {
                             targetItem.click();
@@ -213,8 +161,8 @@ public class SignUpPage extends BasePage {
 
                 try {
                     executePhysicalSwipe(centerX, startY, endY);
-                    // 150ms allows the Android render thread to finish animating lists safely without catching hiccups
-                    Thread.sleep(150);
+                    // Wait for lists scrolling momentum deceleration animation to finish rendering frame steps
+                    Thread.sleep(250);
                 } catch (WebDriverException e) {
                     System.out.println("⚠️ Driver hiccup caught during swipe action. Recovering link...");
                     try { Thread.sleep(300); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
@@ -225,7 +173,6 @@ public class SignUpPage extends BasePage {
                 scrollCount++;
             }
         } finally {
-            // ALWAYS restore your global framework wait safety margin back to its expected default state
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         }
 
@@ -234,28 +181,92 @@ public class SignUpPage extends BasePage {
         }
     }
 
-    private void executePhysicalSwipe(int startX, int startY, int endY) {
-        PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
-        Sequence swipeSequence = new Sequence(finger, 1);
+    public void IsAllowButtonExisit() {
+        By allowButton = ElementRegistry.get("mobile", ElementKey.ALLOW_CONTACT_BUTTON);
+        click(allowButton);
+        click(allowButton);
+    }
 
-        swipeSequence.addAction(finger.createPointerMove(Duration.ZERO, PointerInput.Origin.viewport(), startX, startY));
-        swipeSequence.addAction(finger.createPointerDown(PointerInput.MouseButton.LEFT.asArg()));
-        swipeSequence.addAction(finger.createPointerMove(Duration.ofMillis(350), PointerInput.Origin.viewport(), startX, endY));
-        swipeSequence.addAction(finger.createPointerUp(PointerInput.MouseButton.LEFT.asArg()));
 
-        driver.perform(Collections.singletonList(swipeSequence));
+
+
+
+    public boolean CancelUploadAvatarProcess() {
+        By changeAvatar = ElementRegistry.get("mobile", ElementKey.CHANGE_AVATAR);
+        By uploadPhoto = ElementRegistry.get("mobile", ElementKey.UPLOAD_PHOTO);
+
+        By selectPhoto = ElementRegistry.get("mobile", ElementKey.SELECT_USER_PHONE_PHOTO);
+
+        By JUST_ONE_SELECT = ElementRegistry.get("mobile", ElementKey.JUST_ONE_SELECT);
+        By CANCEL_BUTTON = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON);
+        By NAVIGATE_BACK = ElementRegistry.get("mobile", ElementKey.NAVIGATE_BACK);
+
+
+        click(changeAvatar);
+        click(uploadPhoto);
+        click(selectPhoto);
+        click(JUST_ONE_SELECT);
+        click(CANCEL_BUTTON);
+        click(NAVIGATE_BACK);
+        return isDisplayed(NAVIGATE_BACK);
+    }
+
+    public boolean verifyErrorMessageViaOcr(String expectedMessage) {
+        String normalizedExpected = expectedMessage.toLowerCase()
+                .replaceAll("[^a-z0-9]", ""); // 🚀 Removes spaces, dashes, pluses completely
+
+        System.out.println("==================================================");
+        System.out.println("🎯 TARGET NORMALIZED EXPECTED: [" + normalizedExpected + "]");
+        System.out.println("==================================================");
+
+        org.openqa.selenium.support.ui.WebDriverWait customWait =
+                new org.openqa.selenium.support.ui.WebDriverWait(driver, Duration.ofSeconds(5));
+
+        boolean isMatchFound = false;
+
+        try {
+            isMatchFound = customWait.until(d -> {
+                String rawOcrText = ToastOcrHandler.captureAndReadToast(driver);
+
+                if (rawOcrText == null || rawOcrText.isEmpty()) {
+                    return false;
+                }
+
+                String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
+                System.out.println("📸 Polling Screen via OCR for compressed layout matches...");
+
+                return normalizedOcr.contains(normalizedExpected);
+            });
+        } catch (org.openqa.selenium.TimeoutException e) {
+            System.out.println("❌ Timeout: The expected error text was not found via OCR within 5 seconds.");
+        }
+
+        try {
+            By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
+            waitClickable(cancelBtn).click();
+            System.out.println("✅ Cancel creation button found and clicked.");
+        } catch (Exception e) {
+            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
+        }
+
+        return isMatchFound;
+    }
+    public void clickOkButton() {
+        By okButton = ElementRegistry.get("mobile", ElementKey.OK_BUTTON);
+        click(okButton);
     }
 
     public void clickSubmitWithoutInputs() {
-        waitForClickability(ElementsPage.SignUpField).click();
-        try {
-            waitForClickability(ElementsPage.CANCLE_BUTTON_CREATION).click();
-            System.out.println("✅ Cancel creation button found and clicked.");
-        } catch (org.openqa.selenium.TimeoutException | org.openqa.selenium.NoSuchElementException e) {
-            System.out.println("ℹ️ Cancel creation button was not visible on screen. Continuing test execution workflow...");
-        }
         clickContinue();
 
 
     }
+
+
+    public boolean IsVerificationFieldExisit() {
+        By codeField = ElementRegistry.get("mobile", ElementKey.VERIFICATION_FIELD);
+        return isDisplayed(codeField);
+    }
+
+
 }

@@ -5,25 +5,35 @@ import java.io.IOException;
 import java.util.Properties;
 
 public class ConfigReader {
-    private static Properties properties;
 
-    public static void loadConfig(String fileName) {
-        try {
-            properties = new Properties();
+    private static final Properties properties = new Properties();
+    private static boolean loaded = false;
 
-            FileInputStream input = new FileInputStream("src/test/resources/" + fileName);
+    public static synchronized void loadConfig(String fileName) {
+        if (loaded) return;
+
+        try (FileInputStream input =
+                     new FileInputStream("src/test/resources/" + fileName)) {
+
             properties.load(input);
+            loaded = true;
+
         } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Could not load properties file: " + fileName);
+            throw new RuntimeException("Failed to load config: " + fileName, e);
         }
     }
 
     public static String getProperty(String key) {
-        if (properties == null) {
-            //Default Emulator
+        if (!loaded) {
             loadConfig("emulator.properties");
         }
         return properties.getProperty(key);
+    }
+
+    public static String getProperty(String key, String defaultValue) {
+        if (!loaded) {
+            loadConfig("emulator.properties");
+        }
+        return properties.getProperty(key, defaultValue);
     }
 }
