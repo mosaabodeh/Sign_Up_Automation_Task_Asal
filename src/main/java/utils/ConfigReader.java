@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -11,9 +12,12 @@ public class ConfigReader {
 
     public static synchronized void loadConfig(String fileName) {
         if (loaded) return;
-
-        try (FileInputStream input =
-                     new FileInputStream("src/test/resources/" + fileName)) {
+        final String path = System.getProperty("user.dir")
+                + File.separator + "src"
+                + File.separator + "test"
+                + File.separator + "resources"
+                + File.separator + fileName;
+        try (FileInputStream input =new FileInputStream(path)) {
 
             properties.load(input);
             loaded = true;
@@ -22,6 +26,7 @@ public class ConfigReader {
             throw new RuntimeException("Failed to load config: " + fileName, e);
         }
     }
+
 
     public static String getProperty(String key) {
         if (!loaded) {

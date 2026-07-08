@@ -24,21 +24,21 @@ public class SignUpPage extends BasePage {
     }
 
     public void enterEmail(String email) {
-        By emailField = ElementRegistry.get("mobile", ElementKey.EMAIL_FIELD);
+        By emailField = ElementRegistry.get( ElementKey.EMAIL_FIELD);
         type(emailField, email);
     }
 
     public void clickContinue() {
-        By continueBtn = ElementRegistry.get("mobile", ElementKey.CONTINUE_BUTTON);
+        By continueBtn = ElementRegistry.get( ElementKey.CONTINUE_BUTTON);
         click(continueBtn);
     }
 
 
     public void submitEmailStage(String email) {
-        By signUpButton = ElementRegistry.get("mobile", ElementKey.SIGNUP_FIELD);
+        By signUpButton = ElementRegistry.get( ElementKey.SIGNUP_FIELD);
         click(signUpButton) ;
-        By emailField = ElementRegistry.get("mobile", ElementKey.EMAIL_FIELD);
-        By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
+        By emailField = ElementRegistry.get( ElementKey.EMAIL_FIELD);
+        By cancelBtn = ElementRegistry.get( ElementKey.CANCEL_BUTTON_CREATION);
 
         click(emailField);
         try {
@@ -51,13 +51,13 @@ public class SignUpPage extends BasePage {
     }
 
     public void enterPassword(String password) {
-        By passwordField = ElementRegistry.get("mobile", ElementKey.PASSWORD_FIELD);
+        By passwordField = ElementRegistry.get( ElementKey.PASSWORD_FIELD);
         type(passwordField, password);
     }
 
 
     protected void clickTermsButton() {
-        By termsCheckbox = ElementRegistry.get("mobile", ElementKey.TERMS_CHECKBOX);
+        By termsCheckbox = ElementRegistry.get( ElementKey.TERMS_CHECKBOX);
         org.openqa.selenium.WebElement element = waitClickable(termsCheckbox);
         int xOffset = -(element.getSize().getWidth() / 2) + 35;
         new Actions(driver)
@@ -66,8 +66,8 @@ public class SignUpPage extends BasePage {
                 .perform();
     }
     public void submitPasswordStage(String password, String code) {
-        By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
-        By codeField = ElementRegistry.get("mobile", ElementKey.VERIFICATION_FIELD);
+        By cancelBtn = ElementRegistry.get( ElementKey.CANCEL_BUTTON_CREATION);
+        By codeField = ElementRegistry.get( ElementKey.VERIFICATION_FIELD);
         try {
             click(cancelBtn);
         } catch (Exception ignored) {}
@@ -78,10 +78,10 @@ public class SignUpPage extends BasePage {
         clickContinue();
     }
     public void fillPersonalInfo(String firstName, String lastName, String targetCountry) {
-        By firstNameField = ElementRegistry.get("mobile", ElementKey.FIRST_NAME_FIELD);
-        By lastNameField = ElementRegistry.get("mobile", ElementKey.LAST_NAME_FIELD);
-        By countryDropdownField = ElementRegistry.get("mobile", ElementKey.COUNTRY_DROPDOWN_FIELD);
-        By finishButton = ElementRegistry.get("mobile", ElementKey.FINISH_BUTTON);
+        By firstNameField = ElementRegistry.get( ElementKey.FIRST_NAME_FIELD);
+        By lastNameField = ElementRegistry.get( ElementKey.LAST_NAME_FIELD);
+        By countryDropdownField = ElementRegistry.get( ElementKey.COUNTRY_DROPDOWN_FIELD);
+        By finishButton = ElementRegistry.get( ElementKey.FINISH_BUTTON);
 
         waitClickable(firstNameField).sendKeys(firstName);
         waitClickable(lastNameField).sendKeys(lastName);
@@ -110,67 +110,34 @@ public class SignUpPage extends BasePage {
 
         driver.perform(Collections.singletonList(swipeSequence));
     }
-
     public void scrollToElementAndClick(String targetText) {
-        boolean elementFound = false;
-        int maxScrolls = 20;
-        int scrollCount = 0;
+        String cleanKeyword = extractCleanKeyword(targetText);
+        String lowerCaseXpath = buildLowerCaseXpath(cleanKeyword);
 
-        String cleanKeyword = targetText.trim().toLowerCase();
-        if (cleanKeyword.contains(",")) {
-            cleanKeyword = cleanKeyword.split(",")[0].trim();
-        }
-
-        // FIX: Instead of getting bounds from the tiny form input field button,
-        // we locate the active scrollable view/spinner layout on screen to grab the correct heights
-        WebElement activeScrollContainer = waitVisible(AppiumBy.xpath(
+        WebElement activeScrollContainer = waitVisible(By.xpath(
                 "//android.widget.ListView | //android.widget.ScrollView | //android.view.View[@scrollable='true']"
         ));
 
-        // Get the full screen layout bounds of the opened scroll selection area
         org.openqa.selenium.Rectangle containerRect = activeScrollContainer.getRect();
         int centerX = containerRect.getX() + (containerRect.getWidth() / 2);
-        int startY = containerRect.getY() + (int)(containerRect.getHeight() * 0.80);
-        int endY = containerRect.getY() + (int)(containerRect.getHeight() * 0.20);
+        int startY = containerRect.getY() + (int) (containerRect.getHeight() * 0.80);
+        int endY = containerRect.getY() + (int) (containerRect.getHeight() * 0.20);
 
-        String lowerCaseXpath = ".//android.widget.TextView[contains(translate(@text, " +
-                "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + cleanKeyword + "')]";
+        boolean elementFound = false;
+        int maxScrolls = 20;
+        int scrollCount = 0;
 
         try {
             driver.manage().timeouts().implicitlyWait(Duration.ZERO);
 
             while (!elementFound && scrollCount < maxScrolls) {
-                // Scan elements strictly relative inside the active overlay list block container
-                List<WebElement> elements = activeScrollContainer.findElements(AppiumBy.xpath(lowerCaseXpath));
+                elementFound = tryClickMatchingElement(activeScrollContainer, lowerCaseXpath, targetText);
 
-                if (!elements.isEmpty()) {
-                    WebElement targetItem = elements.getFirst();
-                    if (targetItem.isDisplayed()) {
-                        try {
-                            targetItem.findElement(AppiumBy.xpath("./..")).click();
-                        } catch (Exception e) {
-                            targetItem.click();
-                        }
-                        elementFound = true;
-                        System.out.println("✅ Target matched and clicked: " + targetText);
-                        break;
-                    }
+                if (!elementFound) {
+                    System.out.println("Scrolling list item wrapper... Step " + (scrollCount + 1));
+                    performScrollStep(centerX, startY, endY);
+                    scrollCount++;
                 }
-
-                System.out.println("Scrolling list item wrapper... Step " + (scrollCount + 1));
-
-                try {
-                    executePhysicalSwipe(centerX, startY, endY);
-                    // Wait for lists scrolling momentum deceleration animation to finish rendering frame steps
-                    Thread.sleep(250);
-                } catch (WebDriverException e) {
-                    System.out.println("⚠️ Driver hiccup caught during swipe action. Recovering link...");
-                    try { Thread.sleep(300); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-
-                scrollCount++;
             }
         } finally {
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
@@ -181,25 +148,77 @@ public class SignUpPage extends BasePage {
         }
     }
 
+    private String extractCleanKeyword(String targetText) {
+        String cleanKeyword = targetText.trim().toLowerCase();
+        if (cleanKeyword.contains(",")) {
+            cleanKeyword = cleanKeyword.split(",")[0].trim();
+        }
+        return cleanKeyword;
+    }
+
+    private String buildLowerCaseXpath(String cleanKeyword) {
+        return ".//android.widget.TextView[contains(translate(@text, " +
+                "'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), '" + cleanKeyword + "')]";
+    }
+
+    private boolean tryClickMatchingElement(WebElement container, String lowerCaseXpath, String targetText) {
+        // Scan elements strictly relative inside the active overlay list block container
+        List<WebElement> elements = container.findElements(By.xpath(lowerCaseXpath));
+
+        if (elements.isEmpty()) {
+            return false;
+        }
+
+        WebElement targetItem = elements.getFirst();
+        if (!targetItem.isDisplayed()) {
+            return false;
+        }
+
+        clickTargetOrParent(targetItem);
+        System.out.println("✅ Target matched and clicked: " + targetText);
+        return true;
+    }
+
+    private void clickTargetOrParent(WebElement targetItem) {
+        try {
+            targetItem.findElement(By.xpath("./..")).click();
+        } catch (Exception e) {
+            targetItem.click();
+        }
+    }
+
+    private void performScrollStep(int centerX, int startY, int endY) {
+        try {
+            executePhysicalSwipe(centerX, startY, endY);
+            // Wait for lists scrolling momentum deceleration animation to finish rendering frame steps
+            Thread.sleep(250);
+        } catch (WebDriverException e) {
+            System.out.println("⚠️ Driver hiccup caught during swipe action. Recovering link...");
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
     public void IsAllowButtonExisit() {
-        By allowButton = ElementRegistry.get("mobile", ElementKey.ALLOW_CONTACT_BUTTON);
+        By allowButton = ElementRegistry.get( ElementKey.ALLOW_CONTACT_BUTTON);
         click(allowButton);
         click(allowButton);
     }
 
 
-
-
-
     public boolean CancelUploadAvatarProcess() {
-        By changeAvatar = ElementRegistry.get("mobile", ElementKey.CHANGE_AVATAR);
-        By uploadPhoto = ElementRegistry.get("mobile", ElementKey.UPLOAD_PHOTO);
+        By changeAvatar = ElementRegistry.get( ElementKey.CHANGE_AVATAR);
+        By uploadPhoto = ElementRegistry.get( ElementKey.UPLOAD_PHOTO);
 
-        By selectPhoto = ElementRegistry.get("mobile", ElementKey.SELECT_USER_PHONE_PHOTO);
+        By selectPhoto = ElementRegistry.get( ElementKey.SELECT_USER_PHONE_PHOTO);
 
-        By JUST_ONE_SELECT = ElementRegistry.get("mobile", ElementKey.JUST_ONE_SELECT);
-        By CANCEL_BUTTON = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON);
-        By NAVIGATE_BACK = ElementRegistry.get("mobile", ElementKey.NAVIGATE_BACK);
+        By JUST_ONE_SELECT = ElementRegistry.get( ElementKey.JUST_ONE_SELECT);
+        By CANCEL_BUTTON = ElementRegistry.get( ElementKey.CANCEL_BUTTON);
+        By NAVIGATE_BACK = ElementRegistry.get( ElementKey.NAVIGATE_BACK);
 
 
         click(changeAvatar);
@@ -208,12 +227,18 @@ public class SignUpPage extends BasePage {
         click(JUST_ONE_SELECT);
         click(CANCEL_BUTTON);
         click(NAVIGATE_BACK);
-        return isDisplayed(NAVIGATE_BACK);
+        click(ElementRegistry.get( ElementKey.USER_MENU));
+        click(ElementRegistry.get( ElementKey.USER_MENU));
+        click(ElementRegistry.get( ElementKey.LOGOUT_BUTTON));
+        click(ElementRegistry.get( ElementKey.LOGOUT_CONFIRM));
+
+        return isDisplayed(ElementRegistry.get( ElementKey.EMAIL_FIELD));
+
     }
 
     public boolean verifyErrorMessageViaOcr(String expectedMessage) {
         String normalizedExpected = expectedMessage.toLowerCase()
-                .replaceAll("[^a-z0-9]", ""); // 🚀 Removes spaces, dashes, pluses completely
+                .replaceAll("[^a-z0-9]", "");
 
         System.out.println("==================================================");
         System.out.println("🎯 TARGET NORMALIZED EXPECTED: [" + normalizedExpected + "]");
@@ -242,7 +267,7 @@ public class SignUpPage extends BasePage {
         }
 
         try {
-            By cancelBtn = ElementRegistry.get("mobile", ElementKey.CANCEL_BUTTON_CREATION);
+            By cancelBtn = ElementRegistry.get( ElementKey.CANCEL_BUTTON_CREATION);
             waitClickable(cancelBtn).click();
             System.out.println("✅ Cancel creation button found and clicked.");
         } catch (Exception e) {
@@ -252,19 +277,20 @@ public class SignUpPage extends BasePage {
         return isMatchFound;
     }
     public void clickOkButton() {
-        By okButton = ElementRegistry.get("mobile", ElementKey.OK_BUTTON);
+        By okButton = ElementRegistry.get( ElementKey.OK_BUTTON);
+        click(ElementRegistry.get( ElementKey.OK_BUTTON));
+        click(ElementRegistry.get( ElementKey.SIGN_IN_BUTTON));
         click(okButton);
     }
 
     public void clickSubmitWithoutInputs() {
         clickContinue();
 
-
     }
 
 
     public boolean IsVerificationFieldExisit() {
-        By codeField = ElementRegistry.get("mobile", ElementKey.VERIFICATION_FIELD);
+        By codeField = ElementRegistry.get( ElementKey.VERIFICATION_FIELD);
         return isDisplayed(codeField);
     }
 

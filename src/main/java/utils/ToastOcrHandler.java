@@ -26,7 +26,7 @@ public class ToastOcrHandler {
     }
 
     public static String captureAndReadToast(AppiumDriver driver) {
-        File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+        File screenshot = ( driver).getScreenshotAs(OutputType.FILE);
 
         try {
             File tempFile = Files.createTempFile("toast_", ".png").toFile();

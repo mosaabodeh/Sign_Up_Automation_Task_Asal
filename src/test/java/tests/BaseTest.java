@@ -11,6 +11,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
 import utils.ConfigReader;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
@@ -42,15 +43,13 @@ public class BaseTest {
     public void setUp(@Optional("realdevice") String targetEnv, @Optional("8201") String systemPort) throws MalformedURLException {
         ConfigReader.loadConfig(targetEnv + ".properties");
 
-        boolean isSignUpTestClass = this.getClass().getName().contains("SignUp");
-
         UiAutomator2Options options = new UiAutomator2Options()
                 .setPlatformName(ConfigReader.getProperty("platform.name"))
                 .setAutomationName(ConfigReader.getProperty("automation.name"))
                 .setDeviceName(ConfigReader.getProperty("device.name"))
                 .setAppPackage(ConfigReader.getProperty("app.package"))
                 .setAppActivity(ConfigReader.getProperty("app.activity"))
-                .setNoReset(!isSignUpTestClass)
+                .setNoReset(!isSignUpTestClass())
                 .setFullReset(false);
 
         options.setSystemPort(Integer.parseInt(systemPort));
@@ -58,9 +57,7 @@ public class BaseTest {
         options.setCapability("appium:ensureWebviewsHavePages", true);
         options.setCapability("appium:includeWindows", true);
         options.setCapability("appium:settings[allowWindowOcclusion]", true);
-        // Remove this or set it to false in your driver setup options:
         options.setCapability("appium:includeWindows", false);
-
         String udid = ConfigReader.getProperty("device.udid");
         if (udid != null && !udid.isEmpty()) {
             options.setUdid(udid);
@@ -73,17 +70,16 @@ public class BaseTest {
     }
 
     @BeforeMethod
-    public void launchAppCleanly(java.lang.reflect.Method method) {
+    public void launchAppCleanly() {
         if (getDriver() != null) {
             String appPackage = ConfigReader.getProperty("app.package");
-            boolean isSignUpTestMethod = method.getName().toLowerCase().contains("signup");
 
             try {
                 System.out.println("🔄 >>> Cycling application state...");
                 getDriver().terminateApp(appPackage);
                 getDriver().activateApp(appPackage);
 
-                if (isSignUpTestMethod) {
+                if (isSignUpTestClass()) {
                     System.out.println("🔗 >>> Aligning target view via Sign-Up Deep Link routing...");
                     triggerDeepLink("rainbow://signup", appPackage);
                 } else {
@@ -97,6 +93,10 @@ public class BaseTest {
                 getDriver().activateApp(appPackage);
             }
         }
+    }
+
+    private boolean isSignUpTestClass() {
+        return this.getClass().getName().contains("SignUp");
     }
 
     @AfterMethod

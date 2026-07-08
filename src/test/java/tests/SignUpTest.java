@@ -2,35 +2,26 @@ package tests;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pages.SignUpPage;
 import utils.EmailUtils;
 import utils.JsonReader;
 
 public class SignUpTest extends BaseTest {
+
     private static final String SIGNUP_DATA_FILE = "signUpData.json";
+
     private SignUpPage signUpPage;
-    private final String APP_PACKAGE = "com.ale.rainbow";
 
     @BeforeClass
     public void initializePages() {
         this.signUpPage = new SignUpPage(getDriver());
     }
 
-    @BeforeMethod
-    public void resetAppState() {
-        System.out.println("🔄 Hot-reloading application layout state to establish test isolation...");
-        try {
-            getDriver().terminateApp(APP_PACKAGE);
-            getDriver().activateApp(APP_PACKAGE);
-        } catch (Exception e) {
-            System.out.println("⚠️ Driver warning resetting application package state: " + e.getMessage());
-        }
-    }
-
-    @Test(priority = 1, description = "Complete the dynamic sign up registration funnel")
+    @Test(priority = 1, groups = { "android" },
+            description = "Complete the dynamic sign up registration funnel")
     public void testSignUpFlow() {
+
         String emailBase = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailBase");
         String emailDomain = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailDomain");
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
@@ -38,43 +29,43 @@ public class SignUpTest extends BaseTest {
         String firstName = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "firstName");
         String lastName = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "lastName");
         String country = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "country");
-        String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
 
+        String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
         signUpPage.submitEmailStage(targetEmail);
 
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String registrationCode = EmailUtils.getVerificationCode(targetEmail, appPasswordForGetCodeFromEmail);
         System.out.println("✅ Found Code: " + registrationCode);
+
         signUpPage.submitPasswordStage(passwordForSignUp, registrationCode);
         signUpPage.fillPersonalInfo(firstName, lastName, country);
+
         System.out.println(" The User With Data: " + firstName + "\t" + lastName + "\t" + "From : " + country + " Is Sign Up Successfully");
-       signUpPage.IsAllowButtonExisit();
+        signUpPage.IsAllowButtonExisit();
 
-        signUpPage.CancelUploadAvatarProcess();
         Assert.assertTrue(signUpPage.CancelUploadAvatarProcess(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
-        //navegation back
-        //navegation menu
-
     }
 
-
-    @Test(priority = 2, description = "Complete the dynamic sign up registration ensure bad scenario")
+    @Test(priority = 2, groups = { "android" },
+            description = "Complete the dynamic sign up registration ensure bad scenario")
     public void invalidSignUp() {
         String emailBase = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailBase");
         String emailDomain = JsonReader.getTestData(SIGNUP_DATA_FILE, "invalidEmailSignUp", "email");
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
 
         signUpPage.submitEmailStage(targetEmail);
-        System.out.println("The Current Email is: " + targetEmail);
 
+        System.out.println("The Current Email is: " + targetEmail);
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "invalidEmailSignUp", "expectedErrorMessage");
         boolean isVisible = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
 
         Assert.assertTrue(isVisible, "The validation error message '" + expectedErrorMessage + "' was not detected via OCR.");
     }
 
-    @Test(priority = 3, description = "Verify that entering a weak password displays the appropriate complexity validation error message via OCR")
+    @Test(priority = 3, groups = { "android" },
+            description = "Verify that entering a weak password displays the appropriate complexity validation error message via OCR")
     public void testWeakPasswordSignUpValidation() {
+
         String emailBase = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "emailBase");
         String emailDomain = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "emailDomain");
         String passwordForSignUp = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "password");
@@ -82,33 +73,32 @@ public class SignUpTest extends BaseTest {
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
 
         signUpPage.submitEmailStage(targetEmail);
-
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
         String registrationCode = EmailUtils.getVerificationCode(targetEmail, appPasswordForGetCodeFromEmail);
-        System.out.println("✅ Found Code: " + registrationCode);
 
+        System.out.println("✅ Found Code: " + registrationCode);
         signUpPage.submitPasswordStage(passwordForSignUp, registrationCode);
 
         System.out.println("🔍 Scanning screen via OCR for error: " + expectedErrorMessage);
+
         boolean isErrorDisplayed = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
-        signUpPage. clickOkButton();
+        signUpPage.clickOkButton();
         Assert.assertTrue(isErrorDisplayed, "Failsafe: The expected validation error message '" + expectedErrorMessage + "' was not found by OCR scanning.");
     }
 
-    @Test(priority = 4, description = "Verify that attempting to submit with blank mandatory fields throws structural validation inline errors")
+    @Test(priority = 4, groups = { "android" },
+            description = "Verify that attempting to submit with blank mandatory fields throws structural validation inline errors")
     public void testBlankMandatoryFieldsValidation() {
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "EmptyFieldsSignUp", "expectedErrorMessage");
-
         signUpPage.clickSubmitWithoutInputs();
 
         boolean isErrorDisplayed = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
-
         Assert.assertTrue(isErrorDisplayed, "Failsafe: Missing field mandatory warning labels were not detected by OCR scanning.");
-
     }
 
-    @Test(priority = 5, description = "Verify that signing up with an already registered email throws a duplicate registration toast exception")
+    @Test(priority = 5, groups = { "android" },
+            description = "Verify that signing up with an already registered email throws a duplicate registration toast exception")
     public void testDuplicateEmailRegistrationValidation() {
         String duplicateEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "email");
         System.out.println("The User Email is : " + duplicateEmail);

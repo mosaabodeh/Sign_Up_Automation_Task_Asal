@@ -35,8 +35,12 @@ public enum ElementKey {
 
     // Creation
     CANCEL_BUTTON_CREATION,
-
+    SIGN_IN_BUTTON,
+    YES_BUTTON,
     // Gallery
     JUST_ONE_SELECT,
     OK_BUTTON
+    ,USER_MENU
+    ,LOGOUT_BUTTON,
+    LOGOUT_CONFIRM
 }

@@ -9,9 +9,7 @@ import java.util.Map;
 public class ElementRegistry {
 
     private static final Map<String, Map<ElementKey, By>> REGISTRY = new HashMap<>();
-
     static {
-
         Map<ElementKey, By> mobile = new HashMap<>();
 
         // Permissions
@@ -73,11 +71,11 @@ public class ElementRegistry {
 
 
         mobile.put(ElementKey.FIRST_NAME_FIELD,
-                AppiumBy.xpath(
+                By. xpath(
                         "//android.widget.EditText[./android.widget.TextView[contains(@text,'First name')]]"));
 
         mobile.put(ElementKey.LAST_NAME_FIELD,
-                AppiumBy.xpath(
+                By.xpath(
                         "//android.widget.EditText[./android.widget.TextView[contains(@text,'Last name')]]"));
 
         mobile.put(ElementKey.COUNTRY_DROPDOWN_FIELD,
@@ -99,31 +97,46 @@ public class ElementRegistry {
         mobile.put(ElementKey.OK_BUTTON,
                 AppiumBy.androidUIAutomator(
                         "new UiSelector().className(\"android.view.View\").instance(4)"));
+        mobile.put(ElementKey.SIGN_IN_BUTTON,
+                AppiumBy.androidUIAutomator(
+                        "new UiSelector().className(\"android.view.View\").instance(12)"));
 
         mobile.put(ElementKey.PASSWORD_FIELD,
-                AppiumBy.xpath(
+                By.xpath(
                         "//android.widget.EditText[.//android.widget.TextView[@text='Enter a password']]"));
 
         mobile.put(ElementKey.VERIFICATION_FIELD,
-                AppiumBy.xpath(
+                By.xpath(
                         "//android.widget.EditText[.//android.widget.TextView[@text='Verification code']]"));
+       mobile.put(
+                ElementKey.USER_MENU,
+                By.xpath("//androidx.compose.ui.platform.ComposeView[@resource-id='com.ale.rainbow:id/compose_view']/android.view.View/android.view.View[1]")
+        );
 
-        REGISTRY.put("mobile", mobile);
-    }
 
-    public static By get(String platform, ElementKey key) {
+        mobile.put(
+                ElementKey.LOGOUT_BUTTON,
+                AppiumBy.id("com.ale.rainbow:id/drawer_exit")
+        );
 
-        Map<ElementKey, By> map = REGISTRY.get(platform.toLowerCase());
+        mobile.put(
+                ElementKey.LOGOUT_CONFIRM,
+                AppiumBy.id("android:id/button1")
+        );
+        REGISTRY.put("android", mobile);    }
+
+    public static By get(ElementKey key) {
+        Map<ElementKey, By> map = REGISTRY.get("android");
 
         if (map == null) {
-            throw new IllegalArgumentException("Unknown platform: " + platform);
+            throw new IllegalArgumentException(
+                    "No locator registry found for platform: android");
         }
 
         By locator = map.get(key);
-
         if (locator == null) {
             throw new IllegalArgumentException(
-                    "Locator not found for key: " + key);
+                    "Locator not found for key: " + key + " on platform: android");
         }
 
         return locator;
