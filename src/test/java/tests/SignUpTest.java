@@ -71,7 +71,7 @@ public class SignUpTest extends BaseTest {
         String passwordForSignUp = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "password");
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "expectedErrorMessage");
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
-        signUpPage.clickNoButton();
+        signUpPage.restScenarioTest3();
         signUpPage.submitEmailStage(targetEmail);
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
@@ -106,6 +106,6 @@ public class SignUpTest extends BaseTest {
         signUpPage.clickNoButton();
         signUpPage.submitEmailStage(duplicateEmail);
         // The toast message doesn't appear because of security reasons
-        Assert.assertTrue(signUpPage.IsVerificationFieldExisit(), "Failsafe: Duplicate email profile warning.");
+        Assert.assertTrue(signUpPage.IsVerificationFieldExist(), "Failsafe: Duplicate email profile warning.");
     }
 }

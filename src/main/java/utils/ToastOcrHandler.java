@@ -4,7 +4,6 @@ import io.appium.java_client.AppiumDriver;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
 import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,12 +15,12 @@ public class ToastOcrHandler {
     private static final String PROJECT_ROOT = System.getProperty("user.dir");
 
     static {
-        String tessdataPath = PROJECT_ROOT + File.separator + "src"
+        String testatePath = PROJECT_ROOT + File.separator + "src"
                 + File.separator + "test"
                 + File.separator + "resources"
                 + File.separator + "tessdata";
 
-        tesseract.setDatapath(tessdataPath);
+        tesseract.setDatapath(testatePath);
         tesseract.setLanguage("eng");
     }
 
