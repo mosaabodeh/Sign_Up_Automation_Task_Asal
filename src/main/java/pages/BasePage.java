@@ -1,13 +1,9 @@
 package pages;
 
 import io.appium.java_client.AppiumDriver;
-import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.nativekey.AndroidKey;
-import io.appium.java_client.android.nativekey.KeyEvent;
-import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.PointerInput;
 import org.openqa.selenium.interactions.Sequence;
@@ -18,16 +14,17 @@ import pages.locators.ElementRegistry;
 import utils.ConfigReader;
 import io.appium.java_client.HasOnScreenKeyboard;
 import io.appium.java_client.HidesKeyboard;
+import utils.ToastOcrHandler;
+
 import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
 public class BasePage {
 
-
-
     protected AppiumDriver driver;
     protected WebDriverWait wait;
+    protected static final Logger log = LoggerFactory.getLogger(BasePage.class);
 
     public BasePage(AppiumDriver driver) {
         this.driver = driver;
@@ -51,7 +48,6 @@ public class BasePage {
         waitClickable(locator).click();
     }
 
-
     protected void type(By locator, String text) {
         WebElement el = waitVisible(locator);
         el.clear();
@@ -67,14 +63,15 @@ public class BasePage {
     }
 
     protected void clickTermsButton() {
-        By termsCheckbox = ElementRegistry.get( ElementKey.TERMS_CHECKBOX);
-        org.openqa.selenium.WebElement element = waitClickable(termsCheckbox);
+        By termsCheckbox = ElementRegistry.get(ElementKey.TERMS_CHECKBOX);
+        WebElement element = waitClickable(termsCheckbox);
         int xOffset = -(element.getSize().getWidth() / 2) + 35;
         new Actions(driver)
                 .moveToElement(element, xOffset, 0)
                 .click()
                 .perform();
     }
+
     private void executePhysicalSwipe(int startX, int startY, int endY) {
         PointerInput finger = new PointerInput(PointerInput.Kind.TOUCH, "finger");
         Sequence swipeSequence = new Sequence(finger, 1);
@@ -87,13 +84,14 @@ public class BasePage {
 
         driver.perform(Collections.singletonList(swipeSequence));
     }
+
     private void performScrollStep(int centerX, int startY, int endY) {
         try {
             executePhysicalSwipe(centerX, startY, endY);
             // Wait for lists scrolling momentum deceleration animation to finish rendering frame steps
             Thread.sleep(250);
         } catch (WebDriverException e) {
-            System.out.println("⚠️ Driver hiccup caught during swipe action. Recovering link...");
+            log.warn("Driver hiccup caught during swipe action. Recovering...", e);
             try {
                 Thread.sleep(300);
             } catch (InterruptedException ie) {
@@ -103,6 +101,7 @@ public class BasePage {
             Thread.currentThread().interrupt();
         }
     }
+
     public void scrollToElementAndClick(String targetText) {
         String cleanKeyword = extractCleanKeyword(targetText);
         String lowerCaseXpath = buildLowerCaseXpath(cleanKeyword);
@@ -127,7 +126,7 @@ public class BasePage {
                 elementFound = tryClickMatchingElement(activeScrollContainer, lowerCaseXpath, targetText);
 
                 if (!elementFound) {
-                    System.out.println("Scrolling list item wrapper... Step " + (scrollCount + 1));
+                    log.debug("Scrolling list item wrapper... Step {}", scrollCount + 1);
                     performScrollStep(centerX, startY, endY);
                     scrollCount++;
                 }
@@ -168,8 +167,46 @@ public class BasePage {
         }
 
         clickTargetOrParent(targetItem);
-        System.out.println("✅ Target matched and clicked: " + targetText);
+        log.info("Target matched and clicked: {}", targetText);
         return true;
+    }
+
+
+    public boolean verifyErrorMessageViaOcr(String expectedMessage) {
+        String normalizedExpected = expectedMessage.toLowerCase()
+                .replaceAll("[^a-z0-9]", "");
+
+        log.info("Target normalized expected: [{}]", normalizedExpected);
+
+        WebDriverWait customWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        boolean isMatchFound = false;
+
+        try {
+            isMatchFound = customWait.until(d -> {
+                String rawOcrText = ToastOcrHandler.captureAndReadToast(driver);
+
+                if (rawOcrText == null || rawOcrText.isEmpty()) {
+                    return false;
+                }
+
+                String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
+                log.debug("Polling screen via OCR for compressed layout matches...");
+                log.debug("OCR result: [{}]", normalizedOcr);
+                return normalizedOcr.contains(normalizedExpected);
+            });
+        } catch (TimeoutException e) {
+            log.warn("Timeout: expected error text not found via OCR within 5 seconds.");
+        }
+
+        try {
+            By cancelBtn = ElementRegistry.get(ElementKey.CANCEL_BUTTON_CREATION);
+            waitClickable(cancelBtn).click();
+            log.info("Cancel creation button found and clicked.");
+        } catch (Exception e) {
+            log.info("Cancel creation button was not visible on screen. Continuing test execution workflow.");
+        }
+
+        return isMatchFound;
     }
 
     private void clickTargetOrParent(WebElement targetItem) {
@@ -179,23 +216,40 @@ public class BasePage {
             targetItem.click();
         }
     }
+    public void clickContinue() {
+        By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
+        click(continueBtn);
+    }
+    public void clickNoButton() {
+        click(ElementRegistry.get(ElementKey.NO_BUTTON));
+    }
+    public void clickTheTwoAllowButtons() {
+        By allowButton = ElementRegistry.get(ElementKey.ALLOW_CONTACT_BUTTON);
+        click(allowButton);
+        click(allowButton);
+    }
+    public void clickOkButton() {
+        click(ElementRegistry.get(ElementKey.OK_BUTTON));
+    }
 
-
+    public void clickSignIn() {
+        click(ElementRegistry.get(ElementKey.SIGN_IN_BUTTON));
+    }
     protected void hideKeyboardIfShown() {
         try {
             if (driver instanceof HasOnScreenKeyboard && driver instanceof HidesKeyboard) {
                 boolean shown = ((HasOnScreenKeyboard) driver).isKeyboardShown();
-                System.out.println("⌨️ Keyboard shown status: " + shown);
+                log.info("Keyboard shown status: {}", shown);
 
                 if (shown) {
                     ((HidesKeyboard) driver).hideKeyboard();
-                    System.out.println("⌨️ hideKeyboard() called.");
+                    log.info("hideKeyboard() called.");
                 }
             } else {
-                System.out.println("⚠️ Driver does not support keyboard visibility APIs.");
+                log.warn("Driver does not support keyboard visibility APIs.");
             }
         } catch (Exception e) {
-            System.out.println("⚠️ hideKeyboardIfShown() failed: " + e.getMessage());
+            log.warn("hideKeyboardIfShown() failed: {}", e.getMessage());
         }
     }
 }

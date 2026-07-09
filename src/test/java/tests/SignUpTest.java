@@ -3,6 +3,7 @@ package tests;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+import pages.ProfilePage;
 import pages.SignUpPage;
 import utils.EmailUtils;
 import utils.JsonReader;
@@ -12,10 +13,11 @@ public class SignUpTest extends BaseTest {
     private static final String SIGNUP_DATA_FILE = "signUpData.json";
 
     private SignUpPage signUpPage;
-
+    private ProfilePage profilePage;
     @BeforeClass
     public void initializePages() {
         this.signUpPage = new SignUpPage(getDriver());
+        this.profilePage=new ProfilePage(getDriver());
     }
 
     @Test(priority = 1, groups = { "android" },
@@ -41,9 +43,10 @@ public class SignUpTest extends BaseTest {
         signUpPage.fillPersonalInfo(firstName, lastName, country);
 
         System.out.println(" The User With Data: " + firstName + "\t" + lastName + "\t" + "From : " + country + " Is Sign Up Successfully");
-        signUpPage.IsAllowButtonExisit();
+        signUpPage.clickTheTwoAllowButtons();
 
-        Assert.assertTrue(signUpPage.CancelUploadAvatarProcess(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
+        Assert.assertTrue(profilePage.cancelUploadAvatarAndLogOutProcess(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
+
     }
 
     @Test(priority = 2, groups = { "android" },
@@ -58,7 +61,6 @@ public class SignUpTest extends BaseTest {
         System.out.println("The Current Email is: " + targetEmail);
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "invalidEmailSignUp", "expectedErrorMessage");
         boolean isVisible = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
-//change the no after end
         Assert.assertTrue(isVisible, "The validation error message '" + expectedErrorMessage + "' was not detected via OCR.");
     }
 
@@ -71,7 +73,9 @@ public class SignUpTest extends BaseTest {
         String passwordForSignUp = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "password");
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "expectedErrorMessage");
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
-        signUpPage.restScenarioTest3();
+
+        profilePage.dismissOkAndSignInPrompt();
+
         signUpPage.submitEmailStage(targetEmail);
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
@@ -106,6 +110,6 @@ public class SignUpTest extends BaseTest {
         signUpPage.clickNoButton();
         signUpPage.submitEmailStage(duplicateEmail);
         // The toast message doesn't appear because of security reasons
-        Assert.assertTrue(signUpPage.IsVerificationFieldExist(), "Failsafe: Duplicate email profile warning.");
+        Assert.assertTrue(profilePage.isVerificationFieldExist(), "Failsafe: Duplicate email profile warning.");
     }
 }

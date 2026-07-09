@@ -11,30 +11,36 @@ import java.nio.file.Files;
 
 public class ToastOcrHandler {
 
-    private static final Tesseract tesseract = new Tesseract();
     private static final String PROJECT_ROOT = System.getProperty("user.dir");
 
-    static {
-        String testatePath = PROJECT_ROOT + File.separator + "src"
+
+    private static final ThreadLocal<Tesseract> TESSERACT_THREAD = ThreadLocal.withInitial(() -> {
+        Tesseract instance = new Tesseract();
+        String tessDataPath = PROJECT_ROOT + File.separator + "src"
                 + File.separator + "test"
                 + File.separator + "resources"
                 + File.separator + "tessdata";
-
-        tesseract.setDatapath(testatePath);
-        tesseract.setLanguage("eng");
-    }
+        instance.setDatapath(tessDataPath);
+        instance.setLanguage("eng");
+        return instance;
+    });
 
     public static String captureAndReadToast(AppiumDriver driver) {
-        File screenshot = ( driver).getScreenshotAs(OutputType.FILE);
+        File screenshot = driver.getScreenshotAs(OutputType.FILE);
+        File tempFile = null;
 
         try {
-            File tempFile = Files.createTempFile("toast_", ".png").toFile();
+            tempFile = Files.createTempFile("toast_", ".png").toFile();
             org.apache.commons.io.FileUtils.copyFile(screenshot, tempFile);
-
-            return tesseract.doOCR(tempFile);
+            return TESSERACT_THREAD.get().doOCR(tempFile);
 
         } catch (IOException | TesseractException e) {
+            System.out.println("⚠️ OCR capture/read failed: " + e.getMessage());
             return "OCR_ERROR: " + e.getMessage();
+        } finally {
+            if (tempFile != null && tempFile.exists() && !tempFile.delete()) {
+                tempFile.deleteOnExit();
+            }
         }
     }
 }
