@@ -52,14 +52,14 @@ public class SignUpPage extends BasePage {
     }
 
     public void fillPersonalInfo(String firstName, String lastName, String targetCountry) {
-        SpinnerScrollHelper page=new SpinnerScrollHelper(this.driver);
+        SpinnerScrollHelper spinnerScrollHelper=new SpinnerScrollHelper(this.driver);
         waitClickable(ElementRegistry.get(ElementKey.FIRST_NAME_FIELD)).sendKeys(firstName);
         waitClickable(ElementRegistry.get(ElementKey.LAST_NAME_FIELD)).sendKeys(lastName);
         hideKeyboardIfShown();
 
-        page.waitClickable(ElementRegistry.get(ElementKey.COUNTRY_DROPDOWN_FIELD)).click();
-        page.scrollToElementAndClick(targetCountry);
-        page.waitClickable(ElementRegistry.get(ElementKey.FINISH_BUTTON)).click();
+        spinnerScrollHelper.waitClickable(ElementRegistry.get(ElementKey.COUNTRY_DROPDOWN_FIELD)).click();
+        spinnerScrollHelper.scrollToElementAndClick(targetCountry);
+        spinnerScrollHelper.waitClickable(ElementRegistry.get(ElementKey.FINISH_BUTTON)).click();
     }
 
     public void clickSubmitWithoutInputs() {
