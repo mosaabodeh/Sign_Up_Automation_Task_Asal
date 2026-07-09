@@ -85,20 +85,21 @@ public class BasePage {
         driver.perform(Collections.singletonList(swipeSequence));
     }
 
+    private void pauseFor(Duration duration) {
+        try {
+            new WebDriverWait(driver, duration).until(d -> false);
+        } catch (TimeoutException expected) {
+            log.warn(String.valueOf(expected));
+        }
+    }
+
     private void performScrollStep(int centerX, int startY, int endY) {
         try {
             executePhysicalSwipe(centerX, startY, endY);
-            // Wait for lists scrolling momentum deceleration animation to finish rendering frame steps
-            Thread.sleep(250);
+            pauseFor(Duration.ofMillis(250));
         } catch (WebDriverException e) {
             log.warn("Driver hiccup caught during swipe action. Recovering...", e);
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ie) {
-                Thread.currentThread().interrupt();
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            pauseFor(Duration.ofMillis(300));
         }
     }
 
