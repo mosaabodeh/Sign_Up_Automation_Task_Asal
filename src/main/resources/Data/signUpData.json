@@ -35,6 +35,6 @@
   },
 
   "EmptyFieldsSignUp": {
-    "expectedErrorMessage": "Login or password is missing"
+    "expectedErrorMessage": "rainbow a create your account field is mandatory email address 1 enter an email address example:john@doeacme.com"
   }
 }

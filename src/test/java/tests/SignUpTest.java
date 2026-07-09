@@ -58,7 +58,7 @@ public class SignUpTest extends BaseTest {
         System.out.println("The Current Email is: " + targetEmail);
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "invalidEmailSignUp", "expectedErrorMessage");
         boolean isVisible = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
-
+//change the no after end
         Assert.assertTrue(isVisible, "The validation error message '" + expectedErrorMessage + "' was not detected via OCR.");
     }
 
@@ -71,7 +71,7 @@ public class SignUpTest extends BaseTest {
         String passwordForSignUp = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "password");
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "expectedErrorMessage");
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
-
+        signUpPage.clickNoButton();
         signUpPage.submitEmailStage(targetEmail);
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
@@ -90,6 +90,7 @@ public class SignUpTest extends BaseTest {
     @Test(priority = 4, groups = { "android" },
             description = "Verify that attempting to submit with blank mandatory fields throws structural validation inline errors")
     public void testBlankMandatoryFieldsValidation() {
+
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "EmptyFieldsSignUp", "expectedErrorMessage");
         signUpPage.clickSubmitWithoutInputs();
 
@@ -102,6 +103,7 @@ public class SignUpTest extends BaseTest {
     public void testDuplicateEmailRegistrationValidation() {
         String duplicateEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "email");
         System.out.println("The User Email is : " + duplicateEmail);
+        signUpPage.clickNoButton();
         signUpPage.submitEmailStage(duplicateEmail);
         // The toast message doesn't appear because of security reasons
         Assert.assertTrue(signUpPage.IsVerificationFieldExisit(), "Failsafe: Duplicate email profile warning.");

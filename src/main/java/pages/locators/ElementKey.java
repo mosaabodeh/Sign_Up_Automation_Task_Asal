@@ -15,7 +15,7 @@ public enum ElementKey {
 
     // Navigation
     NAVIGATE_BACK,
-
+    SIGN_UP_BUTTON,
     // Continue
     CONTINUE_BUTTON,
     CONTINUE_BUTTON_ASSERTION,
@@ -37,6 +37,7 @@ public enum ElementKey {
     CANCEL_BUTTON_CREATION,
     SIGN_IN_BUTTON,
     YES_BUTTON,
+    NO_BUTTON,
     // Gallery
     JUST_ONE_SELECT,
     OK_BUTTON

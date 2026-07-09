@@ -100,6 +100,12 @@ public class ElementRegistry {
         mobile.put(ElementKey.SIGN_IN_BUTTON,
                 AppiumBy.androidUIAutomator(
                         "new UiSelector().className(\"android.view.View\").instance(12)"));
+        mobile.put(ElementKey.NO_BUTTON,
+                AppiumBy.androidUIAutomator(
+                        "new UiSelector().className(\"android.widget.Button\").instance(1)"));
+        mobile.put(ElementKey.SIGN_UP_BUTTON,
+                AppiumBy.androidUIAutomator(
+                        "new UiSelector().className(\"android.view.View\").instance(10)"));
 
         mobile.put(ElementKey.PASSWORD_FIELD,
                 By.xpath(

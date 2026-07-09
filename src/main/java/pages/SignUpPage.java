@@ -1,6 +1,5 @@
 package pages;
 
-import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -87,14 +86,8 @@ public class SignUpPage extends BasePage {
         waitClickable(lastNameField).sendKeys(lastName);
 
         hideKeyboardIfShown();
-
-        // 1. Open the spinner dropdown list overlay
         waitClickable(countryDropdownField).click();
-
-        // 2. Perform the dynamic scrolling search
         scrollToElementAndClick(targetCountry);
-
-        // 3. Confirm selection
         waitClickable(finishButton).click();
     }
 
@@ -259,7 +252,7 @@ public class SignUpPage extends BasePage {
 
                 String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
                 System.out.println("📸 Polling Screen via OCR for compressed layout matches...");
-
+                System.out.println("The Real Ocr Found is : "+normalizedOcr);
                 return normalizedOcr.contains(normalizedExpected);
             });
         } catch (org.openqa.selenium.TimeoutException e) {
@@ -277,15 +270,17 @@ public class SignUpPage extends BasePage {
         return isMatchFound;
     }
     public void clickOkButton() {
-        By okButton = ElementRegistry.get( ElementKey.OK_BUTTON);
-        click(ElementRegistry.get( ElementKey.OK_BUTTON));
-        click(ElementRegistry.get( ElementKey.SIGN_IN_BUTTON));
+        By okButton = ElementRegistry.get(ElementKey.OK_BUTTON);
+        click(ElementRegistry.get(ElementKey.OK_BUTTON));
+        click(ElementRegistry.get(ElementKey.OK_BUTTON));
+        click(ElementRegistry.get(ElementKey.SIGN_IN_BUTTON));
         click(okButton);
     }
 
     public void clickSubmitWithoutInputs() {
+        hideKeyboardIfShown();
+        click(ElementRegistry.get( ElementKey.SIGN_UP_BUTTON));
         clickContinue();
-
     }
 
 
@@ -295,4 +290,7 @@ public class SignUpPage extends BasePage {
     }
 
 
+    public void clickNoButton() {
+        click(ElementRegistry.get( ElementKey.NO_BUTTON));
+    }
 }
