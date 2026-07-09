@@ -57,6 +57,7 @@ public class SignUpPage extends BasePage {
         waitClickable(ElementRegistry.get(ElementKey.LAST_NAME_FIELD)).sendKeys(lastName);
         hideKeyboardIfShown();
 
+
         spinnerScrollHelper.waitClickable(ElementRegistry.get(ElementKey.COUNTRY_DROPDOWN_FIELD)).click();
         spinnerScrollHelper.scrollToElementAndClick(targetCountry);
         spinnerScrollHelper.waitClickable(ElementRegistry.get(ElementKey.FINISH_BUTTON)).click();
