@@ -34,6 +34,7 @@ public class BaseTest {
                 .withArgument(() -> "--allow-cors");
 
         server = AppiumDriverLocalService.buildService(builder);
+        server = AppiumDriverLocalService.buildService(builder);
         server.start();
         System.out.println(">>> Appium Server started automatically <<<");
     }
@@ -88,11 +89,20 @@ public class BaseTest {
                 }
 
                 System.out.println("✅ >>> App is active and ready for test execution.");
+
+
+                waitForScreenReady();
+
             } catch (Exception e) {
                 System.out.println("⚠️ Fallback: Forcing basic app activation due to: " + e.getMessage());
                 getDriver().activateApp(appPackage);
             }
         }
+    }
+
+
+    protected void waitForScreenReady() {
+        // Intentionally empty — subclasses override if they need a screen-ready check.
     }
 
     private boolean isSignUpTestClass() {

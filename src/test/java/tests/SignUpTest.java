@@ -14,10 +14,16 @@ public class SignUpTest extends BaseTest {
 
     private SignUpPage signUpPage;
     private ProfilePage profilePage;
+
     @BeforeClass
     public void initializePages() {
         this.signUpPage = new SignUpPage(getDriver());
-        this.profilePage=new ProfilePage(getDriver());
+        this.profilePage = new ProfilePage(getDriver());
+    }
+
+    @Override
+    protected void waitForScreenReady() {
+        signUpPage.ensureSignUpScreenReady();
     }
 
     @Test(priority = 1, groups = { "android" },
@@ -46,7 +52,6 @@ public class SignUpTest extends BaseTest {
         signUpPage.clickTheTwoAllowButtons();
 
         Assert.assertTrue(profilePage.cancelUploadAvatarAndLogOutProcess(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
-
     }
 
     @Test(priority = 2, groups = { "android" },
@@ -74,8 +79,6 @@ public class SignUpTest extends BaseTest {
         String expectedErrorMessage = JsonReader.getTestData(SIGNUP_DATA_FILE, "weakPasswordSignUp", "expectedErrorMessage");
         String targetEmail = emailBase + System.currentTimeMillis() + emailDomain;
 
-        profilePage.dismissOkAndSignInPrompt();
-
         signUpPage.submitEmailStage(targetEmail);
         System.out.println("📬 Fetching verification code sent to: " + targetEmail);
         String appPasswordForGetCodeFromEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "validSignUp", "emailImapPassword");
@@ -89,6 +92,7 @@ public class SignUpTest extends BaseTest {
         boolean isErrorDisplayed = signUpPage.verifyErrorMessageViaOcr(expectedErrorMessage);
         signUpPage.clickOkButton();
         Assert.assertTrue(isErrorDisplayed, "Failsafe: The expected validation error message '" + expectedErrorMessage + "' was not found by OCR scanning.");
+        profilePage.dismissOkAndSignInPrompt();
     }
 
     @Test(priority = 4, groups = { "android" },
