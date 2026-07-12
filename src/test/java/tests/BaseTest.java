@@ -6,10 +6,13 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
+import pages.locators.ElementKey;
+import pages.locators.ElementRegistry;
 import utils.ConfigReader;
 
 import java.io.File;
@@ -33,7 +36,6 @@ public class BaseTest {
                 .usingPort(4723)
                 .withArgument(() -> "--allow-cors");
 
-        server = AppiumDriverLocalService.buildService(builder);
         server = AppiumDriverLocalService.buildService(builder);
         server.start();
         System.out.println(">>> Appium Server started automatically <<<");
@@ -80,6 +82,10 @@ public class BaseTest {
                 getDriver().terminateApp(appPackage);
                 getDriver().activateApp(appPackage);
 
+                // 💡 فحص إذا المستخدم مسجل دخول من تيست سابق، وإذا نعم نعمله لوج آوت
+                // قبل ما نوجه التطبيق للشاشة المطلوبة عبر الـ deep link
+                logOutIfLoggedIn();
+
                 if (isSignUpTestClass()) {
                     System.out.println("🔗 >>> Aligning target view via Sign-Up Deep Link routing...");
                     triggerDeepLink("rainbow://signup", appPackage);
@@ -90,7 +96,6 @@ public class BaseTest {
 
                 System.out.println("✅ >>> App is active and ready for test execution.");
 
-
                 waitForScreenReady();
 
             } catch (Exception e) {
@@ -100,6 +105,29 @@ public class BaseTest {
         }
     }
 
+
+    private void logOutIfLoggedIn() {
+        if (isUserLoggedIn()) {
+            System.out.println("👤 >>> Existing logged-in session detected. Logging out...");
+            try {
+                getDriver().findElement(ElementRegistry.get(ElementKey.USER_MENU)).click();
+                getDriver().findElement(ElementRegistry.get(ElementKey.LOGOUT_BUTTON)).click();
+                getDriver().findElement(ElementRegistry.get(ElementKey.LOGOUT_CONFIRM)).click();
+                System.out.println("✅ >>> Logout completed successfully.");
+            } catch (Exception e) {
+                System.out.println("⚠️ Logout attempt failed: " + e.getMessage());
+            }
+        }
+    }
+
+    private boolean isUserLoggedIn() {
+        try {
+            By userMenuLocator = ElementRegistry.get(ElementKey.USER_MENU);
+            return getDriver().findElement(userMenuLocator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     protected void waitForScreenReady() {
         // Intentionally empty — subclasses override if they need a screen-ready check.
