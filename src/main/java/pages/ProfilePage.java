@@ -23,8 +23,14 @@ public class ProfilePage extends BasePage{
         click(ElementRegistry.get(ElementKey.NAVIGATE_BACK));
         click(ElementRegistry.get(ElementKey.USER_MENU));
 
-        return true;
-    }
+
+        boolean signUpSucceeded = isDisplayed(ElementRegistry.get(ElementKey.USER_MENU));
+
+        if (signUpSucceeded) {
+            click(ElementRegistry.get(ElementKey.USER_MENU));
+        }
+
+        return signUpSucceeded;    }
 
     public void dismissOkAndSignInPrompt() {
         hideKeyboardIfShown();
