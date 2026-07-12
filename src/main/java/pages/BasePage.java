@@ -79,7 +79,7 @@ public class BasePage {
 
                 String normalizedOcr = rawOcrText.toLowerCase().replaceAll("[^a-z0-9]", "");
                 log.debug("Polling screen via OCR for compressed layout matches...");
-                log.debug("OCR result: [{}]", normalizedOcr);
+                System.out.println(("OCR result: [{}]"+ normalizedOcr));
                 return normalizedOcr.contains(normalizedExpected);
             });
         } catch (TimeoutException e) {
@@ -101,9 +101,7 @@ public class BasePage {
         By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
         click(continueBtn);
     }
-    public void clickSignIn() {
-        click(ElementRegistry.get(ElementKey.SIGN_IN_BUTTON));
-    }
+
 
     public void clickNoButton() {
         click(ElementRegistry.get(ElementKey.NO_BUTTON));

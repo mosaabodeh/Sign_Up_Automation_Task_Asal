@@ -34,7 +34,7 @@ public class ProfilePage extends BasePage{
         hideKeyboardIfShown();
         clickOkButton();
         hideKeyboardIfShown();
-        clickSignIn();
+        //clickSignIn();
         clickOkButton();
     }
 
