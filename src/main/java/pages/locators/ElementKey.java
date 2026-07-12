@@ -39,6 +39,7 @@ public enum ElementKey {
     YES_BUTTON,
     NO_BUTTON,
     // Gallery
+    SCROLL_CONTAINER_LOCATOR,
     JUST_ONE_SELECT,
     OK_BUTTON
     ,USER_MENU

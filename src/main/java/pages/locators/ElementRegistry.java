@@ -69,6 +69,9 @@ public class ElementRegistry {
                                 + ".packageName(\"com.ale.rainbow\")"
                                 + ".checkable(true)"));
 
+        mobile.put(ElementKey.SCROLL_CONTAINER_LOCATOR,
+                By. xpath(
+                        "//android.widget.ListView | //android.widget.ScrollView | //android.view.View[@scrollable='true']"));
 
         mobile.put(ElementKey.FIRST_NAME_FIELD,
                 By. xpath(

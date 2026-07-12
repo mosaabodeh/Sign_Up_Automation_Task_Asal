@@ -8,6 +8,8 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import pages.locators.ElementKey;
+import pages.locators.ElementRegistry;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -18,9 +20,6 @@ public class SpinnerScrollHelper {
     private static final Logger log = LoggerFactory.getLogger(SpinnerScrollHelper.class);
 
     private static final int MAX_SCROLLS = 20;
-    private static final By SCROLL_CONTAINER_LOCATOR = By.xpath(
-            "//android.widget.ListView | //android.widget.ScrollView | //android.view.View[@scrollable='true']"
-    );
 
     private final AppiumDriver driver;
     private final WebDriverWait wait;
@@ -35,7 +34,7 @@ public class SpinnerScrollHelper {
         String lowerCaseXpath = buildLowerCaseXpath(cleanKeyword);
 
         WebElement activeScrollContainer = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(SCROLL_CONTAINER_LOCATOR));
+                ExpectedConditions.visibilityOfElementLocated(ElementRegistry.get(ElementKey.SCROLL_CONTAINER_LOCATOR)));
 
         Rectangle containerRect = activeScrollContainer.getRect();
         int centerX = containerRect.getX() + (containerRect.getWidth() / 2);
