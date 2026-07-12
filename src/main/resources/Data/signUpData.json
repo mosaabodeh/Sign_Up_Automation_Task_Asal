@@ -31,7 +31,8 @@
   "duplicateEmailSignUp": {
     "email": "mosaab.cp+1782194902025@gmail.com",
     "password": "SecurePassword123!",
-    "expectedErrorMessage": "Email address already registered"
+    "expectedErrorMessage": "Email address already registered",
+    "emailImapPassword": "ssamtsxmvzlyboeh"
   },
 
   "EmptyFieldsSignUp": {

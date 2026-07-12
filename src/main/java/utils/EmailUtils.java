@@ -4,23 +4,52 @@ import jakarta.mail.*;
 import jakarta.mail.search.FlagTerm;
 
 import java.util.Properties;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class EmailUtils {
 
     private static final String HOST = "imap.gmail.com";
+    private static final int MAX_ATTEMPTS = 6;
+    private static final long RETRY_DELAY_MS = 5000;
+
+    private static final Pattern OTP_PATTERN = Pattern.compile("\\b\\d{6}\\b");
+    private static final String EXISTING_ACCOUNT_INDICATOR =
+            "you recently visited our sign up page using an email corresponding to an existing rainbow account";
 
     public static String getVerificationCode(String email, String password) {
+        String code = pollForEmailContent(email, password, body -> {
+            Matcher matcher = OTP_PATTERN.matcher(body);
+            return matcher.find() ? matcher.group() : null;
+        });
 
+        if (code == null) {
+            throw new RuntimeException("Email OTP not received in time");
+        }
+        return code;
+    }
+
+    /**
+     * Verifies that the "email already registered" notification was received —
+     * i.e. that Rainbow recognized the email as belonging to an existing account.
+     */
+    public static boolean isExistingAccountEmailReceived(String email, String password) {
+        String result = pollForEmailContent(email, password, body -> {
+            String normalizedBody = body.toLowerCase().replaceAll("\\s+", " ").trim();
+            return normalizedBody.contains(EXISTING_ACCOUNT_INDICATOR) ? "found" : null;
+        });
+
+        return result != null;
+    }
+
+    private static String pollForEmailContent(String email, String password, Function<String, String> extractor) {
         Properties props = new Properties();
         props.put("mail.imap.host", HOST);
         props.put("mail.imap.port", "993");
         props.put("mail.imap.ssl.enable", "true");
 
-        Pattern pattern = Pattern.compile("\\b\\d{6}\\b");
-
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < MAX_ATTEMPTS; i++) {
 
             try (Store store = Session.getInstance(props).getStore("imaps")) {
 
@@ -33,15 +62,14 @@ public class EmailUtils {
                             inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
 
                     if (messages.length > 0) {
-
                         Message latest = messages[messages.length - 1];
                         String body = getTextFromMessage(latest);
 
-                        Matcher matcher = pattern.matcher(body);
+                        String extracted = extractor.apply(body);
 
-                        if (matcher.find()) {
+                        if (extracted != null) {
                             latest.setFlag(Flags.Flag.SEEN, true);
-                            return matcher.group();
+                            return extracted;
                         }
                     }
                 }
@@ -50,12 +78,18 @@ public class EmailUtils {
                 System.out.println("IMAP attempt failed: " + e.getMessage());
             }
 
-            try {
-                Thread.sleep(5000);
-            } catch (InterruptedException ignored) {}
+            sleepBeforeRetry();
         }
 
-        throw new RuntimeException("Email OTP not received in time");
+        return null;
+    }
+
+    private static void sleepBeforeRetry() {
+        try {
+            Thread.sleep(RETRY_DELAY_MS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     private static String getTextFromMessage(Message message) throws Exception {
