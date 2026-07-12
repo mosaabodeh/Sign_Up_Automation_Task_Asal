@@ -103,10 +103,6 @@ public class BasePage {
     }
 
 
-    public void clickNoButton() {
-        click(ElementRegistry.get(ElementKey.NO_BUTTON));
-    }
-
     public void clickOkButton() {
         click(ElementRegistry.get(ElementKey.OK_BUTTON));
     }

@@ -33,9 +33,6 @@ public class ProfilePage extends BasePage{
     public void dismissOkAndSignInPrompt() {
         hideKeyboardIfShown();
         clickOkButton();
-       // hideKeyboardIfShown();
-        //clickSignIn();
-       // clickOkButton();
     }
 
     public boolean isVerificationFieldExist() {

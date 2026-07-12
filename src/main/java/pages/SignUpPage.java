@@ -52,6 +52,11 @@ public class SignUpPage extends BasePage {
         clickTermsButton();
         clickContinue();
     }
+    public void clickNoButton() {
+        click(ElementRegistry.get(ElementKey.NO_BUTTON));
+    }
+
+
     protected void clickTermsButton() {
         By termsCheckbox = ElementRegistry.get(ElementKey.TERMS_CHECKBOX);
         WebElement element = waitClickable(termsCheckbox);
