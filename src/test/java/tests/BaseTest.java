@@ -43,7 +43,7 @@ public class BaseTest {
 
     @BeforeClass
     @Parameters({"environment", "systemPort"})
-    public void setUp(@Optional("realdevice") String targetEnv, @Optional("8201") String systemPort) throws MalformedURLException {
+    public void setUp(@Optional("realdevice") String targetEnv, @Optional("8201") String systemPort)  {
         ConfigReader.loadConfig(targetEnv + ".properties");
 
         UiAutomator2Options options = new UiAutomator2Options()
@@ -58,7 +58,6 @@ public class BaseTest {
         options.setSystemPort(Integer.parseInt(systemPort));
         options.setCapability("appium:resetKeyboard", true);
         options.setCapability("appium:ensureWebviewsHavePages", true);
-        options.setCapability("appium:includeWindows", true);
         options.setCapability("appium:settings[allowWindowOcclusion]", true);
         options.setCapability("appium:includeWindows", false);
         String udid = ConfigReader.getProperty("device.udid");
@@ -82,7 +81,6 @@ public class BaseTest {
                 getDriver().terminateApp(appPackage);
                 getDriver().activateApp(appPackage);
 
-
                 logOutIfLoggedIn();
 
                 if (isSignUpTestClass()) {
@@ -96,7 +94,6 @@ public class BaseTest {
                 System.out.println("✅ >>> App is active and ready for test execution.");
 
                 waitForScreenReady();
-
             } catch (Exception e) {
                 System.out.println("⚠️ Fallback: Forcing basic app activation due to: " + e.getMessage());
                 getDriver().activateApp(appPackage);

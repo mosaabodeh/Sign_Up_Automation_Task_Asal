@@ -55,8 +55,6 @@ public class BasePage {
         el.sendKeys(text);
     }
 
-
-
     public boolean verifyErrorMessageViaOcr(String expectedMessage) {
         String normalizedExpected = expectedMessage.toLowerCase()
                 .replaceAll("[^a-z0-9]", "");
@@ -82,7 +80,6 @@ public class BasePage {
         } catch (TimeoutException e) {
             log.warn("Timeout: expected error text not found via OCR within 5 seconds.");
         }
-
         try {
             By cancelBtn = ElementRegistry.get(ElementKey.CANCEL_BUTTON_CREATION);
             waitClickable(cancelBtn).click();
@@ -93,7 +90,6 @@ public class BasePage {
 
         return isMatchFound;
     }
-
 
     public void clickOkButton() {
         click(ElementRegistry.get(ElementKey.OK_BUTTON));
