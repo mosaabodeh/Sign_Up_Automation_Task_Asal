@@ -51,8 +51,8 @@ public class SignUpTest extends BaseTest {
         System.out.println(" The User With Data: " + firstName + "\t" + lastName + "\t" + "From : " + country + " Is Sign Up Successfully");
         signUpPage.clickTheTwoAllowButtons();
 
-        Assert.assertTrue(profilePage.cancelUploadAvatarAndLogOutProcess(), "Failsafe: The Sign up process Flow Not executed Successfully We Cant Interact With Continue Button.");
-    }
+        Assert.assertTrue(profilePage.cancelUploadAvatarAndLogOutProcess(),
+                "Failsafe: Sign-up did not complete successfully — user was not redirected to the login screen after logout.");    }
 
     @Test(priority = 2, groups = { "android" },
             description = "Complete the dynamic sign up registration ensure bad scenario")
