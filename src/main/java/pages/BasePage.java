@@ -5,7 +5,6 @@ import org.openqa.selenium.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.openqa.selenium.interactions.Actions;
-
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import pages.locators.ElementKey;
@@ -59,16 +58,6 @@ public class BasePage {
         }
     }
 
-    protected void clickTermsButton() {
-        By termsCheckbox = ElementRegistry.get(ElementKey.TERMS_CHECKBOX);
-        WebElement element = waitClickable(termsCheckbox);
-        int xOffset = -(element.getSize().getWidth() / 2) + 35;
-        new Actions(driver)
-                .moveToElement(element, xOffset, 0)
-                .click()
-                .perform();
-    }
-
 
 
     public boolean verifyErrorMessageViaOcr(String expectedMessage) {
@@ -112,21 +101,18 @@ public class BasePage {
         By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
         click(continueBtn);
     }
+    public void clickSignIn() {
+        click(ElementRegistry.get(ElementKey.SIGN_IN_BUTTON));
+    }
+
     public void clickNoButton() {
         click(ElementRegistry.get(ElementKey.NO_BUTTON));
     }
-    public void clickTheTwoAllowButtons() {
-        By allowButton = ElementRegistry.get(ElementKey.ALLOW_CONTACT_BUTTON);
-        click(allowButton);
-        click(allowButton);
-    }
+
     public void clickOkButton() {
         click(ElementRegistry.get(ElementKey.OK_BUTTON));
     }
 
-    public void clickSignIn() {
-        click(ElementRegistry.get(ElementKey.SIGN_IN_BUTTON));
-    }
     protected void hideKeyboardIfShown() {
         try {
             if (driver instanceof HasOnScreenKeyboard && driver instanceof HidesKeyboard) {

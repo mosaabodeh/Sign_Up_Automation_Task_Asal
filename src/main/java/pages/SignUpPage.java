@@ -2,6 +2,8 @@ package pages;
 
 import io.appium.java_client.AppiumDriver;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import pages.locators.ElementKey;
@@ -49,6 +51,20 @@ public class SignUpPage extends BasePage {
         enterPassword(password);
         clickTermsButton();
         clickContinue();
+    }
+    protected void clickTermsButton() {
+        By termsCheckbox = ElementRegistry.get(ElementKey.TERMS_CHECKBOX);
+        WebElement element = waitClickable(termsCheckbox);
+        int xOffset = -(element.getSize().getWidth() / 2) + 35;
+        new Actions(driver)
+                .moveToElement(element, xOffset, 0)
+                .click()
+                .perform();
+    }
+    public void clickTheTwoAllowButtons() {
+        By allowButton = ElementRegistry.get(ElementKey.ALLOW_CONTACT_BUTTON);
+        click(allowButton);
+        click(allowButton);
     }
 
     public void fillPersonalInfo(String firstName, String lastName, String targetCountry) {
