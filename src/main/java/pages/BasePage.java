@@ -30,7 +30,13 @@ public class BasePage {
 
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(timeout));
     }
-
+    protected boolean isDisplayed(By locator) {
+        try {
+            return waitVisible(locator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
     protected WebElement waitVisible(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }

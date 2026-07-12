@@ -29,13 +29,7 @@ public class ProfilePage extends BasePage{
         logOutProcess();
         return isDisplayed(ElementRegistry.get(ElementKey.EMAIL_FIELD));
     }
-    protected boolean isDisplayed(By locator) {
-        try {
-            return waitVisible(locator).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
+
     public void dismissOkAndSignInPrompt() {
         hideKeyboardIfShown();
         clickOkButton();

@@ -92,7 +92,6 @@ public class SignUpPage extends BasePage {
         clickContinue();
     }
 
-
     public void ensureSignUpScreenReady() {
         waitVisible(ElementRegistry.get(ElementKey.SIGNUP_FIELD));
         log.info("Sign-up screen confirmed ready.");
