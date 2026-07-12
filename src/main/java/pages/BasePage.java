@@ -50,14 +50,6 @@ public class BasePage {
         el.sendKeys(text);
     }
 
-    protected boolean isDisplayed(By locator) {
-        try {
-            return waitVisible(locator).isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
 
 
     public boolean verifyErrorMessageViaOcr(String expectedMessage) {
@@ -97,10 +89,7 @@ public class BasePage {
         return isMatchFound;
     }
 
-    public void clickContinue() {
-        By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
-        click(continueBtn);
-    }
+
     public void clickOkButton() {
         click(ElementRegistry.get(ElementKey.OK_BUTTON));
     }

@@ -55,7 +55,10 @@ public class SignUpPage extends BasePage {
     public void clickNoButton() {
         click(ElementRegistry.get(ElementKey.NO_BUTTON));
     }
-
+    public void clickContinue() {
+        By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
+        click(continueBtn);
+    }
 
     protected void clickTermsButton() {
         By termsCheckbox = ElementRegistry.get(ElementKey.TERMS_CHECKBOX);
