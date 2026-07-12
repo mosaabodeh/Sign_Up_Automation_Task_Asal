@@ -14,26 +14,27 @@ public class EmailUtils {
     private static final int MAX_ATTEMPTS = 6;
     private static final long RETRY_DELAY_MS = 5000;
 
-    private static final Pattern OTP_PATTERN = Pattern.compile("\\b\\d{6}\\b");
+    private static final Pattern OTP_PATTERN = Pattern.compile(
+            "the following validation code to create your Rainbow account within the next hour:\\s*(\\d{6})",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+    );
+
     private static final String EXISTING_ACCOUNT_INDICATOR =
             "you recently visited our sign up page using an email corresponding to an existing rainbow account";
 
     public static String getVerificationCode(String email, String password) {
         String code = pollForEmailContent(email, password, body -> {
             Matcher matcher = OTP_PATTERN.matcher(body);
-            return matcher.find() ? matcher.group() : null;
+            return matcher.find() ? matcher.group(1) : null;
         });
 
         if (code == null) {
             throw new RuntimeException("Email OTP not received in time");
         }
+
         return code;
     }
 
-    /**
-     * Verifies that the "email already registered" notification was received —
-     * i.e. that Rainbow recognized the email as belonging to an existing account.
-     */
     public static boolean isExistingAccountEmailReceived(String email, String password) {
         String result = pollForEmailContent(email, password, body -> {
             String normalizedBody = body.toLowerCase().replaceAll("\\s+", " ").trim();
@@ -43,11 +44,17 @@ public class EmailUtils {
         return result != null;
     }
 
-    private static String pollForEmailContent(String email, String password, Function<String, String> extractor) {
+    private static String pollForEmailContent(
+            String email,
+            String password,
+            Function<String, String> extractor) {
+
         Properties props = new Properties();
         props.put("mail.imap.host", HOST);
         props.put("mail.imap.port", "993");
         props.put("mail.imap.ssl.enable", "true");
+
+        props.put("mail.imap.expunge", "true");
 
         for (int i = 0; i < MAX_ATTEMPTS; i++) {
 
@@ -63,12 +70,14 @@ public class EmailUtils {
 
                     if (messages.length > 0) {
                         Message latest = messages[messages.length - 1];
+
                         String body = getTextFromMessage(latest);
 
                         String extracted = extractor.apply(body);
 
                         if (extracted != null) {
-                            latest.setFlag(Flags.Flag.SEEN, true);
+                            latest.setFlag(Flags.Flag.DELETED, true);
+
                             return extracted;
                         }
                     }
@@ -99,13 +108,21 @@ public class EmailUtils {
         }
 
         if (message.isMimeType("multipart/*")) {
-            Multipart mp = (Multipart) message.getContent();
+            Multipart multipart = (Multipart) message.getContent();
 
-            for (int i = 0; i < mp.getCount(); i++) {
-                BodyPart part = mp.getBodyPart(i);
+            for (int i = 0; i < multipart.getCount(); i++) {
+                BodyPart part = multipart.getBodyPart(i);
 
                 if (part.isMimeType("text/plain")) {
                     return part.getContent().toString();
+                }
+
+                if (part.isMimeType("text/html")) {
+                    String html = part.getContent().toString();
+                    return html.replaceAll("<[^>]*>", " ")
+                            .replace("&nbsp;", " ")
+                            .replaceAll("\\s+", " ")
+                            .trim();
                 }
             }
         }
