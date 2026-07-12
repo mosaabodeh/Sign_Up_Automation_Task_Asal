@@ -35,6 +35,6 @@
   },
 
   "EmptyFieldsSignUp": {
-    "expectedErrorMessage": "sk4rainbowcreateyouraccountfieldismandatoryemailaddressenteranemailaddressexamplejohndoeacmecomnapleaseenteravalidemailaddressexpectedformatnameexamplecom"
+    "expectedErrorMessage": "please enter a valid email address ! expected Format: name@example.com"
   }
 }

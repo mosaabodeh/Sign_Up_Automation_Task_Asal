@@ -69,7 +69,7 @@ public class SignUpTest extends BaseTest {
         Assert.assertTrue(isVisible, "The validation error message '" + expectedErrorMessage + "' was not detected via OCR.");
     }
 
-    @Test(priority = 3, groups = { "android" },
+    @Test(priority = 4, groups = { "android" },
             description = "Verify that entering a weak password displays the appropriate complexity validation error message via OCR")
     public void testWeakPasswordSignUpValidation() {
 
@@ -95,7 +95,7 @@ public class SignUpTest extends BaseTest {
         profilePage.dismissOkAndSignInPrompt();
     }
 
-    @Test(priority = 4, groups = { "android" },
+    @Test(priority = 3, groups = { "android" },
             description = "Verify that attempting to submit with blank mandatory fields throws structural validation inline errors")
     public void testBlankMandatoryFieldsValidation() {
 
