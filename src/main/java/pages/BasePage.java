@@ -101,8 +101,6 @@ public class BasePage {
         By continueBtn = ElementRegistry.get(ElementKey.CONTINUE_BUTTON);
         click(continueBtn);
     }
-
-
     public void clickOkButton() {
         click(ElementRegistry.get(ElementKey.OK_BUTTON));
     }
