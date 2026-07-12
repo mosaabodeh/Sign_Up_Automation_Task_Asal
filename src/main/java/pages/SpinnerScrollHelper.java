@@ -18,7 +18,6 @@ import java.util.List;
 public class SpinnerScrollHelper {
 
     private static final Logger log = LoggerFactory.getLogger(SpinnerScrollHelper.class);
-
     private static final int MAX_SCROLLS = 20;
 
     private final AppiumDriver driver;

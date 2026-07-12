@@ -12,8 +12,6 @@ public class ProfilePage extends BasePage{
         super(driver);
     }
 
-
-
     public boolean cancelUploadAvatarAndLogOutProcess() {
         click(ElementRegistry.get(ElementKey.CHANGE_AVATAR));
         click(ElementRegistry.get(ElementKey.UPLOAD_PHOTO));
@@ -23,14 +21,12 @@ public class ProfilePage extends BasePage{
         click(ElementRegistry.get(ElementKey.NAVIGATE_BACK));
         click(ElementRegistry.get(ElementKey.USER_MENU));
 
-
         boolean signUpSucceeded = isDisplayed(ElementRegistry.get(ElementKey.USER_MENU));
-
         if (signUpSucceeded) {
             click(ElementRegistry.get(ElementKey.USER_MENU));
         }
-
-        return signUpSucceeded;    }
+        return signUpSucceeded;
+    }
 
     public void dismissOkAndSignInPrompt() {
         hideKeyboardIfShown();

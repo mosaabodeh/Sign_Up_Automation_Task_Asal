@@ -82,8 +82,7 @@ public class BaseTest {
                 getDriver().terminateApp(appPackage);
                 getDriver().activateApp(appPackage);
 
-                // 💡 فحص إذا المستخدم مسجل دخول من تيست سابق، وإذا نعم نعمله لوج آوت
-                // قبل ما نوجه التطبيق للشاشة المطلوبة عبر الـ deep link
+
                 logOutIfLoggedIn();
 
                 if (isSignUpTestClass()) {
@@ -104,7 +103,6 @@ public class BaseTest {
             }
         }
     }
-
 
     private void logOutIfLoggedIn() {
         if (isUserLoggedIn()) {
