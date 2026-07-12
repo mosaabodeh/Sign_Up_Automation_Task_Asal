@@ -110,10 +110,14 @@ public class SignUpTest extends BaseTest {
             description = "Verify that signing up with an already registered email throws a duplicate registration toast exception")
     public void testDuplicateEmailRegistrationValidation() {
         String duplicateEmail = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "email");
-        System.out.println("The User Email is : " + duplicateEmail);
+        String emailImapPassword = JsonReader.getTestData(SIGNUP_DATA_FILE, "duplicateEmailSignUp", "emailImapPassword");
+
         signUpPage.clickNoButton();
         signUpPage.submitEmailStage(duplicateEmail);
-        // The toast message doesn't appear because of security reasons
-        Assert.assertTrue(profilePage.isVerificationFieldExist(), "Failsafe: Duplicate email profile warning.");
+
+        boolean existingAccountNotified = EmailUtils.isExistingAccountEmailReceived(duplicateEmail, emailImapPassword);
+
+        Assert.assertTrue(existingAccountNotified,
+                "Failsafe: Expected 'existing account' notification email was not received for: " + duplicateEmail);
     }
 }

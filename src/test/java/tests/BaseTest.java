@@ -6,17 +6,13 @@ import io.appium.java_client.android.options.UiAutomator2Options;
 import io.appium.java_client.service.local.AppiumDriverLocalService;
 import io.appium.java_client.service.local.AppiumServiceBuilder;
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.testng.ITestResult;
 import org.testng.annotations.*;
-import pages.locators.ElementKey;
-import pages.locators.ElementRegistry;
+import pages.ProfilePage;
 import utils.ConfigReader;
-
 import java.io.File;
-import java.net.MalformedURLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -81,7 +77,7 @@ public class BaseTest {
                 getDriver().terminateApp(appPackage);
                 getDriver().activateApp(appPackage);
 
-                logOutIfLoggedIn();
+                new ProfilePage(getDriver()).logOutIfLoggedIn();
 
                 if (isSignUpTestClass()) {
                     System.out.println("🔗 >>> Aligning target view via Sign-Up Deep Link routing...");
@@ -98,29 +94,6 @@ public class BaseTest {
                 System.out.println("⚠️ Fallback: Forcing basic app activation due to: " + e.getMessage());
                 getDriver().activateApp(appPackage);
             }
-        }
-    }
-
-    private void logOutIfLoggedIn() {
-        if (isUserLoggedIn()) {
-            System.out.println("👤 >>> Existing logged-in session detected. Logging out...");
-            try {
-                getDriver().findElement(ElementRegistry.get(ElementKey.USER_MENU)).click();
-                getDriver().findElement(ElementRegistry.get(ElementKey.LOGOUT_BUTTON)).click();
-                getDriver().findElement(ElementRegistry.get(ElementKey.LOGOUT_CONFIRM)).click();
-                System.out.println("✅ >>> Logout completed successfully.");
-            } catch (Exception e) {
-                System.out.println("⚠️ Logout attempt failed: " + e.getMessage());
-            }
-        }
-    }
-
-    private boolean isUserLoggedIn() {
-        try {
-            By userMenuLocator = ElementRegistry.get(ElementKey.USER_MENU);
-            return getDriver().findElement(userMenuLocator).isDisplayed();
-        } catch (Exception e) {
-            return false;
         }
     }
 

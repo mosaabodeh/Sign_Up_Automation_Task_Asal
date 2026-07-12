@@ -28,13 +28,33 @@ public class ProfilePage extends BasePage{
         return signUpSucceeded;
     }
 
+    public void logOutIfLoggedIn() {
+        if (isUserLoggedIn()) {
+            System.out.println("👤 >>> Existing logged-in session detected. Logging out...");
+            try {
+                driver.findElement(ElementRegistry.get(ElementKey.USER_MENU)).click();
+                driver.findElement(ElementRegistry.get(ElementKey.LOGOUT_BUTTON)).click();
+                driver.findElement(ElementRegistry.get(ElementKey.LOGOUT_CONFIRM)).click();
+                System.out.println("✅ >>> Logout completed successfully.");
+            } catch (Exception e) {
+                System.out.println("⚠️ Logout attempt failed: " + e.getMessage());
+            }
+        }
+    }
+
+    private boolean isUserLoggedIn() {
+        try {
+            By userMenuLocator = ElementRegistry.get(ElementKey.USER_MENU);
+            return driver.findElement(userMenuLocator).isDisplayed();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public void dismissOkAndSignInPrompt() {
         hideKeyboardIfShown();
         clickOkButton();
     }
 
-    public boolean isVerificationFieldExist() {
-        By codeField = ElementRegistry.get(ElementKey.VERIFICATION_FIELD);
-        return isDisplayed(codeField);
-    }
+
 }
