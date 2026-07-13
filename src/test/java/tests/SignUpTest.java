@@ -50,7 +50,7 @@ public class SignUpTest extends BaseTest {
         System.out.println(" The User With Data: " + firstName + "\t" + lastName + "\t" + "From : " + country + " Is Sign Up Successfully");
         signUpPage.clickTheTwoAllowButtons();
 
-        Assert.assertTrue(profilePage.cancelUploadAvatarAndLogOutProcess(),
+        Assert.assertTrue(profilePage.verifyIsUserLoggedIn(),
                 "Failsafe: Sign-up did not complete successfully — user was not redirected to the login screen after logout.");    }
 
     @Test(priority = 2, groups = { "android" },

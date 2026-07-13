@@ -12,7 +12,7 @@ public class ProfilePage extends BasePage{
         super(driver);
     }
 
-    public boolean cancelUploadAvatarAndLogOutProcess() {
+    public boolean verifyIsUserLoggedIn() {
         click(ElementRegistry.get(ElementKey.CHANGE_AVATAR));
         click(ElementRegistry.get(ElementKey.UPLOAD_PHOTO));
         click(ElementRegistry.get(ElementKey.SELECT_USER_PHONE_PHOTO));

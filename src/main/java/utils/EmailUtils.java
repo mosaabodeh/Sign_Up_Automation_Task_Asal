@@ -53,41 +53,43 @@ public class EmailUtils {
         props.put("mail.imap.host", HOST);
         props.put("mail.imap.port", "993");
         props.put("mail.imap.ssl.enable", "true");
-
         props.put("mail.imap.expunge", "true");
 
-        for (int i = 0; i < MAX_ATTEMPTS; i++) {
+        try (Store store = Session.getInstance(props).getStore("imaps")) {
 
-            try (Store store = Session.getInstance(props).getStore("imaps")) {
-
+            try {
                 store.connect(HOST, email, password);
+            } catch (AuthenticationFailedException e) {
+                throw new RuntimeException("IMAP Authentication failed. Check your email, App Password, or IMAP access settings.", e);
+            }
 
+            for (int i = 0; i < MAX_ATTEMPTS; i++) {
                 try (Folder inbox = store.getFolder("INBOX")) {
                     inbox.open(Folder.READ_WRITE);
 
-                    Message[] messages =
-                            inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
+                    Message[] messages = inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false));
 
                     if (messages.length > 0) {
                         Message latest = messages[messages.length - 1];
-
                         String body = getTextFromMessage(latest);
-
                         String extracted = extractor.apply(body);
 
                         if (extracted != null) {
                             latest.setFlag(Flags.Flag.DELETED, true);
-
                             return extracted;
                         }
                     }
+                } catch (Exception e) {
+                    System.out.println("Polled attempt " + (i + 1) + " failed: " + e.getMessage());
                 }
 
-            } catch (Exception e) {
-                System.out.println("IMAP attempt failed: " + e.getMessage());
+                if (i < MAX_ATTEMPTS - 1) {
+                    sleepBeforeRetry();
+                }
             }
 
-            sleepBeforeRetry();
+        } catch (MessagingException e) {
+            System.out.println("IMAP Store connection error: " + e.getMessage());
         }
 
         return null;
@@ -102,7 +104,6 @@ public class EmailUtils {
     }
 
     private static String getTextFromMessage(Message message) throws Exception {
-
         if (message.isMimeType("text/plain")) {
             return message.getContent().toString();
         }
